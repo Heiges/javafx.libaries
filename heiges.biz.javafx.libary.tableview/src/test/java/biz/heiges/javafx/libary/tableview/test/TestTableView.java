@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 public class TestTableView extends Application {
 	
 	ObservableList<TestTableViewBinding> data = FXCollections.observableArrayList();
-	
+		
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -33,15 +33,13 @@ public class TestTableView extends Application {
 		primaryBox.prefWidthProperty().bind(scene.widthProperty());
 		primaryBox.setPadding(new Insets(20, 20, 20, 20));
 		
-		TableView<TestTableViewBinding> table = new TableView<TestTableViewBinding>(new TestItemFactory());
+		TableView<TestTableViewBinding> table = new TableView<TestTableViewBinding>(buildItems(), new TestItemFactory());
 		table.prefHeightProperty().bind(primaryBox.heightProperty());
 		table.prefWidthProperty().bind(primaryBox.widthProperty());
 		table.addStringColumn("a", "Field1StringProperty");
 		table.addStringColumn("b", "Field2StringProperty");
 		table.addStringColumn("c", "StringProperty");
 
-		table.setItems(buildItems());
-		
 		primaryBox.getChildren().add(table);
 		root.getChildren().add(primaryBox);
 		

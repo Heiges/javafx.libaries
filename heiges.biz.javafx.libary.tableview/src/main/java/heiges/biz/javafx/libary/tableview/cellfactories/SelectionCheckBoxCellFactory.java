@@ -12,7 +12,7 @@ import javafx.util.Callback;
 public class SelectionCheckBoxCellFactory<T extends TableViewDataModelBinding> implements Callback<TableColumn<T, Boolean>, TableCell<T, Boolean>>{
 
 	private boolean entered = false;
-	
+		
 	@Override
 	public TableCell<T, Boolean> call(TableColumn<T, Boolean> param) {	
 		

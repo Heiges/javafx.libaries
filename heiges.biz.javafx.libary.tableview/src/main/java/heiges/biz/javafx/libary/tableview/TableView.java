@@ -2,9 +2,11 @@ package heiges.biz.javafx.libary.tableview;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import heiges.biz.javafx.libary.tableview.cellfactories.SelectionCheckBoxCellFactory;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,7 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-//import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
@@ -25,7 +26,9 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 
 	private TableColumn<T, String> headerCol = new TableColumn<T, String>("");
 
-	public TableView(ItemFactory factory) {
+	public TableView(ObservableList<T> items, ItemFactory factory) {
+		
+		super(items);
 
 		InputStream awsome = TableView.class.getResourceAsStream("/fa/fontawesome-webfont.ttf");
 		awesomeFont = Font.loadFont(awsome, 15);
@@ -82,42 +85,55 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 				if (selectAll.isSelected() == true) {
 					selectAll.setSelected(false);
 				}
-				// FIXME uncheck all checked lines?
+
+				// if selectAll should be unchecked after a adding an item do it
+				// here!
+				/*
+				 * for (T binding : getItems()) { if
+				 * (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
+				 * binding.getSelectedProperty().setValue(false); } }
+				 */
 			}
 		});
 
+		/**
+		 * build the delete button
+		 */
 		Label deleteLabel = new Label("\uF014");
 		deleteLabel.setFont(awesomeFont);
 		Button buttonDelete = new Button("", deleteLabel);
 		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				ObservableList<T> newList = FXCollections.observableArrayList();
-				for (T binding : getItems()) {
+				Iterator<T> itemsIterator = getItems().iterator();
+				while (itemsIterator.hasNext()) {
+					T binding = (T) itemsIterator.next();
 					if (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
-					} else {
-						newList.add(binding);
+						itemsIterator.remove();
 					}
 				}
-				// deleting the items in the attached list will result in
-				// ConcurrentModificationExceptions.
-				setItems(newList);
-
-				// after deleting an item the checkbox selectAll must be
-				// unchecked
-				if (selectAll.isSelected() == true) {
-					selectAll.setSelected(false);
-				}
-
 			}
 		});
 
+		/**
+		 * add the buttons to the headerBox
+		 */
 		headerBox = new HBox();
 		HBox.setMargin(buttonNew, new Insets(5, 0, 5, 5));
 		HBox.setMargin(buttonDelete, new Insets(5, 0, 5, 5));
 		headerBox.setAlignment(Pos.TOP_LEFT);
 		headerBox.getChildren().addAll(buttonNew, buttonDelete);
 		headerCol.setGraphic(headerBox);
+
+		items.addListener(new ListChangeListener<T>(){
+			@Override
+			public void onChanged(ListChangeListener.Change<? extends T> changes) {
+ 				// TODO Auto-generated method stub
+				 while(changes.next()) {
+                     System.out.println(changes);
+                 }
+			}
+        });
 	}
 
 	public void addStringColumn(String name, String property) {
