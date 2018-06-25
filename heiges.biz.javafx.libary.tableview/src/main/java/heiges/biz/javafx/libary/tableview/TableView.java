@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import heiges.biz.javafx.libary.tableview.cellfactories.SelectionCheckBoxCellFactory;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -27,7 +25,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 	private TableColumn<T, String> headerCol = new TableColumn<T, String>("");
 
 	public TableView(ObservableList<T> items, ItemFactory factory) {
-		
+
 		super(items);
 
 		InputStream awsome = TableView.class.getResourceAsStream("/fa/fontawesome-webfont.ttf");
@@ -37,14 +35,21 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 
 		setEditable(true);
 
+		getColumns().add(headerCol);
+
+		/**
+		 * build the column for the selected property
+		 */
 		TableColumn<T, Boolean> selectedCol = new TableColumn<T, Boolean>("");
-		selectedCol.setCellFactory(new SelectionCheckBoxCellFactory<>());
+		SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory = new SelectionCheckBoxCellFactory<T>();
+		selectedCol.setCellFactory(selectionCheckBoxCellFactory);
 		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
 		selectedCol.setSortable(false);
 
+		/**
+		 * add the selected column to the header column
+		 */
 		headerCol.getColumns().addAll(Arrays.asList(selectedCol));
-
-		getColumns().add(headerCol);
 
 		/**
 		 * build the checkbox selectAll
@@ -59,6 +64,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 				}
 			}
 		});
+		selectionCheckBoxCellFactory.setSelectAll(selectAll);
 
 		/**
 		 * build the graphics box with the checkboxes
@@ -82,17 +88,13 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 				getItems().add((T) factory.build());
 
 				// after adding an item the checkbox selectAll must be unchecked
-				if (selectAll.isSelected() == true) {
-					selectAll.setSelected(false);
-				}
+				selectAll.setSelected(false);
 
-				// if selectAll should be unchecked after a adding an item do it
-				// here!
-				/*
-				 * for (T binding : getItems()) { if
-				 * (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
-				 * binding.getSelectedProperty().setValue(false); } }
-				 */
+				// if after adding an item all other items must be unselected
+				// do it here with the following code snippet
+				/*for (T binding : getItems()) {
+					binding.getSelectedProperty().setValue(false);
+				}*/
 			}
 		});
 
@@ -124,16 +126,6 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		headerBox.setAlignment(Pos.TOP_LEFT);
 		headerBox.getChildren().addAll(buttonNew, buttonDelete);
 		headerCol.setGraphic(headerBox);
-
-		items.addListener(new ListChangeListener<T>(){
-			@Override
-			public void onChanged(ListChangeListener.Change<? extends T> changes) {
- 				// TODO Auto-generated method stub
-				 while(changes.next()) {
-                     System.out.println(changes);
-                 }
-			}
-        });
 	}
 
 	public void addStringColumn(String name, String property) {
