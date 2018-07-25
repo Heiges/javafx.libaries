@@ -55,13 +55,12 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		 * build the checkbox selectAll
 		 */
 		CheckBox selectAll = new CheckBox();
+		selectAll.setId("selectAllCheckBox");
 		selectedCol.setGraphic(selectAll);
 		selectAll.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				for (T binding : getItems()) {
-					binding.getSelectedProperty().set(selectAll.isSelected());
-				}
+				getItems().stream().forEach(binding -> binding.getSelectedProperty().set(selectAll.isSelected()));
 			}
 		});
 		selectionCheckBoxCellFactory.setSelectAll(selectAll);
@@ -81,6 +80,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		Label newLabel = new Label("\uF067");
 		newLabel.setFont(awesomeFont);
 		Button buttonNew = new Button("", newLabel);
+		buttonNew.setId("newElementButton");
 		buttonNew.setOnAction(new EventHandler<ActionEvent>() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -104,6 +104,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		Label deleteLabel = new Label("\uF014");
 		deleteLabel.setFont(awesomeFont);
 		Button buttonDelete = new Button("", deleteLabel);
+		buttonDelete.setId("deleteElementButton");
 		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
