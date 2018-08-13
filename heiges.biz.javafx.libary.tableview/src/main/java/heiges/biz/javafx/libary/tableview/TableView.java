@@ -28,8 +28,9 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 
 		super(items);
 
-		InputStream awsome = TableView.class.getResourceAsStream("/fa/fontawesome-webfont.ttf");
-		awesomeFont = Font.loadFont(awsome, 15);
+		setId("tableview");
+		
+		loadFontAwesome();
 
 		setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -37,23 +38,75 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 
 		getColumns().add(headerCol);
 
-		/**
-		 * build the column for the selected property
-		 */
-		TableColumn<T, Boolean> selectedCol = new TableColumn<T, Boolean>("");
+		// build the first column with the checkboxes for selecting a line in the tableview
+		TableColumn<T, Boolean> selectedCol = buildSelectedColumn();
 		SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory = new SelectionCheckBoxCellFactory<T>();
 		selectedCol.setCellFactory(selectionCheckBoxCellFactory);
-		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
-		selectedCol.setSortable(false);
-
+		
 		/**
 		 * add the selected column to the header column
 		 */
 		headerCol.getColumns().addAll(Arrays.asList(selectedCol));
 
+		CheckBox selectAll = buildSelectAllCheckBox(selectedCol, selectionCheckBoxCellFactory);
+
+		Button buttonNew = buildNewButton(factory, selectAll);
+
+		Button buttonDelete = buildDeleteButton();
+		
 		/**
-		 * build the checkbox selectAll
+		 * build the graphics box with the checkboxes
 		 */
+		HBox headerBox = new HBox();
+		HBox.setMargin(selectAll, new Insets(5, 0, 5, 5));
+		headerBox.setAlignment(Pos.CENTER_RIGHT);
+		headerBox.getChildren().addAll(selectAll);
+		selectedCol.setGraphic(headerBox);
+
+
+		/**
+		 * add the buttons to the headerBox
+		 */
+		headerBox = new HBox();
+		HBox.setMargin(buttonNew, new Insets(5, 0, 5, 5));
+		HBox.setMargin(buttonDelete, new Insets(5, 0, 5, 5));
+		headerBox.setAlignment(Pos.TOP_LEFT);
+		headerBox.getChildren().addAll(buttonNew, buttonDelete);
+		headerCol.setGraphic(headerBox);
+	}
+
+	/**
+	 * build the delete button
+	 * @return
+	 */
+	private Button buildDeleteButton() {
+		Label deleteLabel = new Label("\uF014");
+		deleteLabel.setFont(awesomeFont);
+		Button buttonDelete = new Button("", deleteLabel);
+		buttonDelete.setId("deleteElementButton");
+		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Iterator<T> itemsIterator = getItems().iterator();
+				while (itemsIterator.hasNext()) {
+					T binding = (T) itemsIterator.next();
+					if (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
+						itemsIterator.remove();
+					}
+				}
+			}
+		});
+		return buttonDelete;
+	}
+
+	/**
+	 * build the checkbox selectAll
+	 * @param selectedCol
+	 * @param selectionCheckBoxCellFactory
+	 * @return
+	 */
+	private CheckBox buildSelectAllCheckBox(TableColumn<T, Boolean> selectedCol,
+			SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory) {
 		CheckBox selectAll = new CheckBox();
 		selectAll.setId("selectAllCheckBox");
 		selectedCol.setGraphic(selectAll);
@@ -64,19 +117,16 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 			}
 		});
 		selectionCheckBoxCellFactory.setSelectAll(selectAll);
+		return selectAll;
+	}
 
-		/**
-		 * build the graphics box with the checkboxes
-		 */
-		HBox headerBox = new HBox();
-		HBox.setMargin(selectAll, new Insets(5, 0, 5, 5));
-		headerBox.setAlignment(Pos.CENTER_RIGHT);
-		headerBox.getChildren().addAll(selectAll);
-		selectedCol.setGraphic(headerBox);
-
-		/**
-		 * build the new button
-		 */
+	/**
+	 * build the new button
+	 * @param factory
+	 * @param selectAll
+	 * @return
+	 */
+	private Button buildNewButton(ItemFactory factory, CheckBox selectAll) {
 		Label newLabel = new Label("\uF067");
 		newLabel.setFont(awesomeFont);
 		Button buttonNew = new Button("", newLabel);
@@ -97,36 +147,24 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 				}*/
 			}
 		});
+		return buttonNew;
+	}
 
-		/**
-		 * build the delete button
-		 */
-		Label deleteLabel = new Label("\uF014");
-		deleteLabel.setFont(awesomeFont);
-		Button buttonDelete = new Button("", deleteLabel);
-		buttonDelete.setId("deleteElementButton");
-		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Iterator<T> itemsIterator = getItems().iterator();
-				while (itemsIterator.hasNext()) {
-					T binding = (T) itemsIterator.next();
-					if (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
-						itemsIterator.remove();
-					}
-				}
-			}
-		});
+	/**
+	 * build the column for the selected property
+	 * @return
+	 */
+	private TableColumn<T, Boolean> buildSelectedColumn() {
+		TableColumn<T, Boolean> selectedCol = new TableColumn<T, Boolean>("");
+		selectedCol.setId("selectedColumn");
+		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
+		selectedCol.setSortable(false);
+		return selectedCol;
+	}
 
-		/**
-		 * add the buttons to the headerBox
-		 */
-		headerBox = new HBox();
-		HBox.setMargin(buttonNew, new Insets(5, 0, 5, 5));
-		HBox.setMargin(buttonDelete, new Insets(5, 0, 5, 5));
-		headerBox.setAlignment(Pos.TOP_LEFT);
-		headerBox.getChildren().addAll(buttonNew, buttonDelete);
-		headerCol.setGraphic(headerBox);
+	private void loadFontAwesome() {
+		InputStream awesome = TableView.class.getResourceAsStream("/fa/fontawesome-webfont.ttf");
+		awesomeFont = Font.loadFont(awesome, 15);
 	}
 
 	public void addStringColumn(String name, String property) {

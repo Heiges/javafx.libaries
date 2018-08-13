@@ -5,11 +5,11 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class TestTableViewBinding extends TableViewDataModelBinding {
 
-	private SimpleStringProperty field1String = new SimpleStringProperty("1");
+	private SimpleStringProperty field1String = new SimpleStringProperty("enter a value");
 	
-	private SimpleStringProperty field2String = new SimpleStringProperty("2");
+	private SimpleStringProperty field2String = new SimpleStringProperty("enter a value");
 
-	private SimpleStringProperty stringProperty = new SimpleStringProperty("3!");
+	private SimpleStringProperty stringProperty = new SimpleStringProperty("enter a value");
 	
 	public void setStringProperty(String value) {
 		this.stringProperty = new SimpleStringProperty(value);

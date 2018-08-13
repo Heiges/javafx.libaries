@@ -36,9 +36,9 @@ public class TestTableView extends Application {
 		TableView<TestTableViewBinding> table = new TableView<TestTableViewBinding>(buildItems(), new TestItemFactory());
 		table.prefHeightProperty().bind(primaryBox.heightProperty());
 		table.prefWidthProperty().bind(primaryBox.widthProperty());
-		table.addStringColumn("a", "Field1StringProperty");
-		table.addStringColumn("b", "Field2StringProperty");
-		table.addStringColumn("c", "StringProperty");
+		table.addStringColumn("Spalte 1", "Field1StringProperty");
+		table.addStringColumn("Spalte 2", "Field2StringProperty");
+		table.addStringColumn("Spalte 3", "StringProperty");
 
 		primaryBox.getChildren().add(table);
 		root.getChildren().add(primaryBox);
@@ -61,13 +61,13 @@ public class TestTableView extends Application {
 	
 	private ObservableList<TestTableViewBinding> buildItems() {
 		TestTableViewBinding binding = new TestTableViewBinding();
-		binding.setField1StringProperty("eins");
-		binding.setField2StringProperty("zwei");
-		binding.setStringProperty("drei");
+		binding.setField1StringProperty("zeile 1 - eins");
+		binding.setField2StringProperty("zweile 1 - zwei");
+		binding.setStringProperty("zeile 1 - drei");
 		TestTableViewBinding binding2 = new TestTableViewBinding();
-		binding2.setField1StringProperty("d");
-		binding2.setField2StringProperty("e");
-		binding2.setStringProperty("f");
+		binding2.setField1StringProperty("zeile 2 - eins");
+		binding2.setField2StringProperty("zeile 2 - zwei");
+		binding2.setStringProperty("zeile 2 - drei");
 		data.addAll(binding, binding2);
 		return data;
 	}
