@@ -11,6 +11,8 @@ public class TestTableViewBinding extends TableViewDataModelBinding {
 
 	private SimpleStringProperty stringProperty = new SimpleStringProperty("enter a value");
 	
+	private SimpleStringProperty comboBoxListProperty = new SimpleStringProperty("select a value");
+	
 	public void setStringProperty(String value) {
 		this.stringProperty = new SimpleStringProperty(value);
 	}
@@ -33,5 +35,13 @@ public class TestTableViewBinding extends TableViewDataModelBinding {
 	
 	public SimpleStringProperty getField2StringProperty() {
 		return field2String;
+	}
+
+	public SimpleStringProperty getComboBoxListProperty() {
+		return comboBoxListProperty;
+	}
+
+	public void setComboBoxListProperty(String comboBoxListProperty) {
+		this.comboBoxListProperty = new SimpleStringProperty(comboBoxListProperty);
 	}
 }

@@ -3,7 +3,9 @@ package heiges.biz.javafx.libary.tableview;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
+import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import heiges.biz.javafx.libary.tableview.cellfactories.SelectionCheckBoxCellFactory;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -62,8 +64,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		headerBox.setAlignment(Pos.CENTER_RIGHT);
 		headerBox.getChildren().addAll(selectAll);
 		selectedCol.setGraphic(headerBox);
-
-
+		
 		/**
 		 * add the buttons to the headerBox
 		 */
@@ -142,9 +143,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 
 				// if after adding an item all other items must be unselected
 				// do it here with the following code snippet
-				/*for (T binding : getItems()) {
-					binding.getSelectedProperty().setValue(false);
-				}*/
+				/* getItems().stream().forEach(binding -> binding.getSelectedProperty().setValue(false)); */
 			}
 		});
 		return buttonNew;
@@ -154,7 +153,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 	 * build the column for the selected property
 	 * @return
 	 */
-	private TableColumn<T, Boolean> buildSelectedColumn() {
+	private TableColumn<T, Boolean> buildSelectedColumn() {	
 		TableColumn<T, Boolean> selectedCol = new TableColumn<T, Boolean>("");
 		selectedCol.setId("selectedColumn");
 		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
@@ -171,7 +170,15 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
-		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		headerCol.getColumns().addAll(Arrays.asList(stringColumn));
 	}
+
+	
+	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
+		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
+		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
+		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
+		comboBoxColumn.setEditable(true);
+		headerCol.getColumns().add(comboBoxColumn);
+	}	
 }

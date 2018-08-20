@@ -28,49 +28,59 @@ public class SelectionCheckBoxCellFactory<T extends TableViewDataModelBinding>
 
 				super.updateItem(selected, empty);
 
-				setAlignment(Pos.CENTER_RIGHT);
-
-				// get the binding for the row
-				TableViewDataModelBinding binding = null;
-				if (this.getTableRow() != null && this.getTableRow().getItem() != null
-						&& this.getTableRow().getItem() instanceof TableViewDataModelBinding) {
-					binding = (TableViewDataModelBinding) this.getTableRow().getItem();
-				}
-
-				if (entered == false && binding != null) {
-					// currently not inside a cell with a checkbox and a binding
-					// exists,
-					// therefore force checkbox depending on selected state
-					super.updateItem(selected, !binding.getSelectedProperty().getValue());
-				} else if (entered == false && binding == null) {
-					// currently not inside the cell with a checkbox and a
-					// binding does not exist,
-					// therefore force a empty cell
-					super.updateItem(selected, true);
-				} else if (entered == true && binding == null) {
-					// currently inside a cell with a checkbox and binding does
-					// not exist,
-					// therefore force a empty cell
-					super.updateItem(selected, true);
-				} else if (entered == true && binding != null) {
-					// currently inside a cell with a checkbox and a binding
-					// does exist,
-					// therefore force a checkbox
-					super.updateItem(selected, false);
-				}
-
-				// set the selectAll checkbox depending in the state of all
-				// items in the tableview
-				if (getSelectAll() != null && binding != null) {
-					ObservableList<T> items = getTableView().getItems();
-					boolean allItemsAreSelected = true;
-					for (T item : items) {
-						if (item.getSelectedProperty().getValue() == false) {
-							allItemsAreSelected = false;
-							break;
-						}
+				/**
+				 * This if-then-else is needed to make javafx happy.
+				 * See also javadoc for the function updateItem
+				 */
+				if (empty || selected == null) {
+			    	 
+					setText(null);
+			        setGraphic(null);
+			    } 
+			    else {
+			
+			    	// This column will never show any text
+			    	setText(null);
+			    	
+			    	/**
+			    	 *  start with the needed functionality for handling the checkbox 
+			    	 */
+			    	
+			    	setAlignment(Pos.CENTER_RIGHT);
+	
+					// get the binding for the row
+					TableViewDataModelBinding binding = null;
+					if (this.getTableRow() != null && this.getTableRow().getItem() != null
+							&& this.getTableRow().getItem() instanceof TableViewDataModelBinding) {
+						binding = (TableViewDataModelBinding) this.getTableRow().getItem();
 					}
-					getSelectAll().selectedProperty().set(allItemsAreSelected);
+	
+					if (entered == false && binding != null) {
+						// currently not inside a cell with a checkbox and a binding exists, therefore force checkbox depending on selected state
+						super.updateItem(selected, !binding.getSelectedProperty().getValue());
+					} else if (entered == false && binding == null) {
+						// currently not inside the cell with a checkbox and a  binding does not exist, therefore force a empty cell
+						super.updateItem(selected, true);
+					} else if (entered == true && binding == null) {
+						// currently inside a cell with a checkbox and binding does not exist, therefore force a empty cell
+						super.updateItem(selected, true);
+					} else if (entered == true && binding != null) {
+						// currently inside a cell with a checkbox and a binding does exist, therefore force a checkbox
+						super.updateItem(selected, false);
+					}
+	
+					// set the selectAll checkbox depending in the state of all items in the tableview
+					if (getSelectAll() != null && binding != null) {
+						ObservableList<T> items = getTableView().getItems();
+						boolean allItemsAreSelected = true;
+						for (T item : items) {
+							if (item.getSelectedProperty().getValue() == false) {
+								allItemsAreSelected = false;
+								break;
+							}
+						}
+						getSelectAll().selectedProperty().set(allItemsAreSelected);
+					}
 				}
 			}
 		};
