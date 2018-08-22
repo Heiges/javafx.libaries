@@ -13,11 +13,11 @@ import javafx.util.Callback;
 public class ComboBoxCellFactory<T extends TableViewDataModelBinding> implements Callback<TableColumn<T, String>, TableCell<T, String>> {
 
 	private List<String> comboBoxList = new ArrayList<String>();
-	
+
 	public ComboBoxCellFactory(List<String> comboBoxList) {
 		this.comboBoxList = comboBoxList;
 	}
-	
+
 	@Override
 	public TableCell<T, String> call(TableColumn<T, String> param) {
 
@@ -25,21 +25,31 @@ public class ComboBoxCellFactory<T extends TableViewDataModelBinding> implements
 
 			@Override
 			public void updateItem(String item, boolean empty) {
-				// TODO Auto-generated method stub
+
 				super.updateItem(item, empty);
-				
-				System.out.println(item);
-				
+
+				if (empty || item == null) {
+					
+					setText(null);
+					setGraphic(null);
+				} 
+				else {
+					
+					getItems().clear();
+					getItems().addAll(FXCollections.observableArrayList(comboBoxList));
+
+					if (comboBoxList.contains(item) == false) {
+						System.out.println(item);
+						comboBoxList.add(item);
+					}
+				}
 			}
-			
 		};
 
-		
-		
 		cell.setComboBoxEditable(true);
-		
+
 		cell.getItems().addAll(FXCollections.observableArrayList(comboBoxList));
-		
+
 		return cell;
 	}
 }

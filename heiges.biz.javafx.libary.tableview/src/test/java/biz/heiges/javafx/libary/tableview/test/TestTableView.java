@@ -79,14 +79,6 @@ public class TestTableView extends Application {
 		return data;
 	}	
 	
-//	private ObservableList<String> buildComboBoxList() {
-//		List<String> l = new ArrayList<String>();
-//		l.add("val1");
-//		l.add("val2");
-//		l.add("val3");
-//		return FXCollections.observableArrayList(l);
-//	}
-	
 	private List<String> buildComboBoxList() {
 		List<String> l = new ArrayList<String>();
 		l.add("val1");
