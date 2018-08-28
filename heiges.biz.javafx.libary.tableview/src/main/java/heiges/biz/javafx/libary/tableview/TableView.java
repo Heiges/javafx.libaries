@@ -2,8 +2,10 @@ package heiges.biz.javafx.libary.tableview;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import heiges.biz.javafx.libary.tableview.cellfactories.SelectionCheckBoxCellFactory;
@@ -22,7 +24,7 @@ import javafx.scene.text.Font;
 
 public class TableView<T extends TableViewDataModelBinding> extends javafx.scene.control.TableView<T> {
 
-	private Font awesomeFont = null;
+	private Map<String, Font> fonts = new HashMap<String, Font>();
 
 	private TableColumn<T, String> headerCol = new TableColumn<T, String>("");
 
@@ -82,7 +84,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 	 */
 	private Button buildDeleteButton() {
 		Label deleteLabel = new Label("\uF014");
-		deleteLabel.setFont(awesomeFont);
+		deleteLabel.setFont(getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button buttonDelete = new Button("", deleteLabel);
 		buttonDelete.setId("deleteElementButton");
 		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
@@ -129,7 +131,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 	 */
 	private Button buildNewButton(ItemFactory factory, CheckBox selectAll) {
 		Label newLabel = new Label("\uF067");
-		newLabel.setFont(awesomeFont);
+		newLabel.setFont(getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button buttonNew = new Button("", newLabel);
 		buttonNew.setId("newElementButton");
 		buttonNew.setOnAction(new EventHandler<ActionEvent>() {
@@ -162,10 +164,20 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 	}
 
 	private void loadFontAwesome() {
-		InputStream awesome = TableView.class.getResourceAsStream("/fa/fontawesome-webfont.ttf");
-		awesomeFont = Font.loadFont(awesome, 15);
+		addFont("/fa/fontawesome-webfont.ttf", 15);
 	}
 
+	public void addFont(String pathOfFont, Integer size) {
+		InputStream input = TableView.class.getResourceAsStream(pathOfFont);
+		Font font  = Font.loadFont(input, size);
+		fonts.put(pathOfFont, font);
+	}
+
+	public Font getFont(String pathOfFont, Integer size) {
+		return fonts.get(pathOfFont);
+	}
+	
+	
 	public void addStringColumn(String name, String property) {
 		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -173,7 +185,6 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		headerCol.getColumns().addAll(Arrays.asList(stringColumn));
 	}
 
-	
 	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
 		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));

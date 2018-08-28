@@ -11,6 +11,8 @@ public class PropertyValueFactory<S, T> implements Callback<CellDataFeatures<S, 
 	private final String property;
 
 	/**
+	 * FIXME this ugly, replace this class with some official javafx PropertyValueFactories
+	 * 
 	 * Creates a default PropertyValueFactory.
 	 *
 	 * @param property
@@ -30,7 +32,7 @@ public class PropertyValueFactory<S, T> implements Callback<CellDataFeatures<S, 
 		try {
 			Class<?> clazz = binding.getClass();
 			Method getProptery = clazz.getMethod("get" + property);
-//			getProptery.setAccessible(true);
+//			getProptery.sAccessible(true);
 			Object invokeGetProperty = getProptery.invoke(binding);
 
 //			if (invokeGetProperty == null) {
@@ -47,6 +49,7 @@ public class PropertyValueFactory<S, T> implements Callback<CellDataFeatures<S, 
 				return (ObservableValue<T>) invokeGetProperty;
 			}
 		} catch (Exception e) {
+			// FIXME
 			System.out.println(e);
 		}
 		return null;
@@ -58,5 +61,4 @@ public class PropertyValueFactory<S, T> implements Callback<CellDataFeatures<S, 
 	public final String getProperty() {
 		return property;
 	}
-
 }
