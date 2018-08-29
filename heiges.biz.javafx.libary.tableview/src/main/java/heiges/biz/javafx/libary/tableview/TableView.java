@@ -9,38 +9,51 @@ import java.util.Map;
 
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import heiges.biz.javafx.libary.tableview.cellfactories.SelectionCheckBoxCellFactory;
+import javafx.beans.property.Property;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
-public class TableView<T extends TableViewDataModelBinding> extends javafx.scene.control.TableView<T> {
-
+public class TableView<T extends TableViewDataModelBinding> 
+{
+	private javafx.scene.control.TableView<T> table = null;
+	
+	private VBox vbox = null;
+	
 	private Map<String, Font> fonts = new HashMap<String, Font>();
 
 	private TableColumn<T, String> headerCol = new TableColumn<T, String>("");
 
 	public TableView(ObservableList<T> items, ItemFactory factory) {
+		
+		table = new javafx.scene.control.TableView<T>(items);
+		
+		vbox = new VBox();
+		vbox.getChildren().add(table);
+		
+		table.prefHeightProperty().bind(vbox.heightProperty());
+		table.prefWidthProperty().bind(vbox.widthProperty());
 
-		super(items);
-
-		setId("tableview");
+		table.setId("tableview");
 		
 		loadFontAwesome();
 
-		setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);
 
-		setEditable(true);
+		table.setEditable(true);
 
-		getColumns().add(headerCol);
+		table.getColumns().add(headerCol);
 
 		// build the first column with the checkboxes for selecting a line in the tableview
 		TableColumn<T, Boolean> selectedCol = buildSelectedColumn();
@@ -90,7 +103,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				Iterator<T> itemsIterator = getItems().iterator();
+				Iterator<T> itemsIterator = table.getItems().iterator();
 				while (itemsIterator.hasNext()) {
 					T binding = (T) itemsIterator.next();
 					if (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
@@ -116,7 +129,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		selectAll.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				getItems().stream().forEach(binding -> binding.getSelectedProperty().set(selectAll.isSelected()));
+				table.getItems().stream().forEach(binding -> binding.getSelectedProperty().set(selectAll.isSelected()));
 			}
 		});
 		selectionCheckBoxCellFactory.setSelectAll(selectAll);
@@ -138,7 +151,7 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 			@SuppressWarnings("unchecked")
 			@Override
 			public void handle(ActionEvent e) {
-				getItems().add((T) factory.build());
+				table.getItems().add((T) factory.build());
 
 				// after adding an item the checkbox selectAll must be unchecked
 				selectAll.setSelected(false);
@@ -191,5 +204,17 @@ public class TableView<T extends TableViewDataModelBinding> extends javafx.scene
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		comboBoxColumn.setEditable(true);
 		headerCol.getColumns().add(comboBoxColumn);
+	}
+
+	public Property<Number> prefHeightProperty() {
+		return vbox.prefHeightProperty();
+	}
+
+	public Property<Number> prefWidthProperty() {
+		return vbox.prefWidthProperty();
+	}
+
+	public Node getRootNode() {
+		return vbox;
 	}	
 }

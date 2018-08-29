@@ -1,7 +1,6 @@
 package biz.heiges.javafx.libary.tableview.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -28,7 +27,7 @@ public class TestUI extends GuiTest {
 		table.addStringColumn("Spalte 1", "Field1StringProperty");
 		table.addStringColumn("Spalte 2", "Field2StringProperty");
 		table.addStringColumn("Spalte 3", "StringProperty");
-		return table;
+		return (Parent) table.getRootNode();
 	}
 
 	@Test
@@ -40,15 +39,6 @@ public class TestUI extends GuiTest {
 		find("#selectAllCheckBox");
 		find("#tableview");
 		assertEquals("wrong count of rows", 2, TableViews.numberOfRowsIn("#tableview"));
-	}
-
-	@Test
-	public void verifyInitalData() {
-		System.out.println("verifyInitalData");
-
-		@SuppressWarnings("unchecked") // can only be a TableView as rootNode has been builded by us!
-		TableView<TestTableViewBinding> rootNode = (TableView<TestTableViewBinding>) getRootNode();
-		assertNotNull(rootNode);
 	}
 
 	/**

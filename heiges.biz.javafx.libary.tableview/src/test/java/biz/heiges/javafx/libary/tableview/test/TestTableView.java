@@ -45,7 +45,7 @@ public class TestTableView extends Application {
 		table.addStringColumn("Spalte 2", "Field2StringProperty");
 		table.addStringColumn("Spalte 3", "StringProperty");
 
-		primaryBox.getChildren().add(table);
+		primaryBox.getChildren().add(table.getRootNode());
 		root.getChildren().add(primaryBox);
 		
 		primaryStage.setScene(scene);
