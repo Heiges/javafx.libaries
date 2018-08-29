@@ -202,7 +202,6 @@ public class TableView<T extends TableViewDataModelBinding>
 		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
-		comboBoxColumn.setEditable(true);
 		headerCol.getColumns().add(comboBoxColumn);
 	}
 
