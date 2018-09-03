@@ -25,74 +25,118 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
-public class TableView<T extends TableViewDataModelBinding> 
-{
+public class TableView<T extends TableViewDataModelBinding> {
+
 	private javafx.scene.control.TableView<T> table = null;
-	
+
 	private VBox vbox = null;
-	
+
 	private Map<String, Font> fonts = new HashMap<String, Font>();
 
-	private TableColumn<T, String> headerCol = new TableColumn<T, String>("");
+	/**
+	 * The main column, all other columns will be added as child columns and
+	 * will be arranged below the main column. The main column will be used for
+	 * all action buttons the affect all items (rows) in the table or the table
+	 * itself (e.g. the delete button will only affect selected rows while the
+	 * new button will add a new item to the table
+	 */
+	private TableColumn<T, String> headerCol = null;
 
+	/**
+	 * 
+	 * @param items
+	 * @param factory
+	 */
 	public TableView(ObservableList<T> items, ItemFactory factory) {
-		
-		table = new javafx.scene.control.TableView<T>(items);
-		
-		vbox = new VBox();
-		vbox.getChildren().add(table);
-		
-		table.prefHeightProperty().bind(vbox.heightProperty());
-		table.prefWidthProperty().bind(vbox.widthProperty());
 
-		table.setId("tableview");
-		
+		/**
+		 * Load font awesome used for build the actionButtons.
+		 */
 		loadFontAwesome();
 
+		/**
+		 * Build the table and the wrapping vbox for the table.
+		 */
+		vbox = new VBox();
+		table = new javafx.scene.control.TableView<T>(items);
+		table.setId("tableview");
+		vbox.getChildren().add(table);
+
+		/**
+		 * Bind the height and width properties of vbox and table and set the
+		 * resize policy.
+		 */
+		table.prefHeightProperty().bind(vbox.heightProperty());
+		table.prefWidthProperty().bind(vbox.widthProperty());
 		table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);
 
-		table.setEditable(true);
-
+		/**
+		 * Build the header column and add it to the table.
+		 */
+		headerCol = new TableColumn<T, String>("");
 		table.getColumns().add(headerCol);
 
-		// build the first column with the checkboxes for selecting a line in the tableview
-		TableColumn<T, Boolean> selectedCol = buildSelectedColumn();
+		/**
+		 * Build the selectARowColumn. This is the first column and will display
+		 * the selectIt action button for selecting or unselecting a row
+		 */
+		TableColumn<T, Boolean> selectARowColumn = buildSelectedColumn();
 		SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory = new SelectionCheckBoxCellFactory<T>();
-		selectedCol.setCellFactory(selectionCheckBoxCellFactory);
-		
+		selectARowColumn.setCellFactory(selectionCheckBoxCellFactory);
+		headerCol.getColumns().addAll(Arrays.asList(selectARowColumn));
+
 		/**
-		 * add the selected column to the header column
+		 * Build the selectAllRows checkbox and add it to the selectARowColumn
+		 * column header. The checkBox will be connected with the checkBox cellFactory for
+		 * displaying the state of the checkbox.
 		 */
-		headerCol.getColumns().addAll(Arrays.asList(selectedCol));
+		CheckBox selectAllRowsCheckBox = buildSelectAllRowsCheckBox(selectARowColumn, selectionCheckBoxCellFactory);
+		HBox selectARowColumnHeaderBox = new HBox();
+		HBox.setMargin(selectAllRowsCheckBox, new Insets(5, 0, 5, 5));
+		selectARowColumnHeaderBox.setAlignment(Pos.CENTER_RIGHT);
+		selectARowColumnHeaderBox.getChildren().addAll(selectAllRowsCheckBox);
+		selectARowColumn.setGraphic(selectARowColumnHeaderBox);
 
-		CheckBox selectAll = buildSelectAllCheckBox(selectedCol, selectionCheckBoxCellFactory);
-
-		Button buttonNew = buildNewButton(factory, selectAll);
-
+		/**
+		 * Build all needed action buttons and add it to headercolumn of the
+		 * table. The selectAllRowsCheckBox will be connected with the new
+		 * action button for changing the state if a new item is added to the
+		 * table.
+		 */
+		Button buttonNew = buildNewButton(factory, selectAllRowsCheckBox);
 		Button buttonDelete = buildDeleteButton();
-		
-		/**
-		 * build the graphics box with the checkboxes
-		 */
-		HBox headerBox = new HBox();
-		HBox.setMargin(selectAll, new Insets(5, 0, 5, 5));
-		headerBox.setAlignment(Pos.CENTER_RIGHT);
-		headerBox.getChildren().addAll(selectAll);
-		selectedCol.setGraphic(headerBox);
-		
-		/**
-		 * add the buttons to the headerBox
-		 */
-		headerBox = new HBox();
+		Button editButton = buildEditButton();
+		HBox actionBox = new HBox();
 		HBox.setMargin(buttonNew, new Insets(5, 0, 5, 5));
 		HBox.setMargin(buttonDelete, new Insets(5, 0, 5, 5));
-		headerBox.setAlignment(Pos.TOP_LEFT);
-		headerBox.getChildren().addAll(buttonNew, buttonDelete);
-		headerCol.setGraphic(headerBox);
+		HBox.setMargin(editButton, new Insets(5, 0, 5, 5));
+		actionBox.setAlignment(Pos.TOP_LEFT);
+		actionBox.getChildren().addAll(buttonNew, buttonDelete, editButton);
+		headerCol.setGraphic(actionBox);
+
+		/**
+		 * set table to editable false
+		 */
+		table.setEditable(true);
+	}
+
+	private Button buildEditButton() {
+		Label editLabel = new Label("\uF044");
+		editLabel.setFont(getFont("/fa/fontawesome-webfont.ttf", 15));
+		Button editButton = new Button("", editLabel);
+		editButton.setId("editButton");
+		editButton.setOnAction(new EventHandler<ActionEvent>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public void handle(ActionEvent e) {
+			}
+		});
+		return editButton;
 	}
 
 	/**
 	 * build the delete button
+	 * 
 	 * @return
 	 */
 	private Button buildDeleteButton() {
@@ -117,15 +161,15 @@ public class TableView<T extends TableViewDataModelBinding>
 
 	/**
 	 * build the checkbox selectAll
+	 * 
 	 * @param selectedCol
 	 * @param selectionCheckBoxCellFactory
 	 * @return
 	 */
-	private CheckBox buildSelectAllCheckBox(TableColumn<T, Boolean> selectedCol,
+	private CheckBox buildSelectAllRowsCheckBox(TableColumn<T, Boolean> selectedCol,
 			SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory) {
 		CheckBox selectAll = new CheckBox();
 		selectAll.setId("selectAllCheckBox");
-		selectedCol.setGraphic(selectAll);
 		selectAll.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -138,6 +182,7 @@ public class TableView<T extends TableViewDataModelBinding>
 
 	/**
 	 * build the new button
+	 * 
 	 * @param factory
 	 * @param selectAll
 	 * @return
@@ -158,17 +203,16 @@ public class TableView<T extends TableViewDataModelBinding>
 
 				// if after adding an item all other items must be unselected
 				// do it here with the following code snippet
-				/* getItems().stream().forEach(binding -> binding.getSelectedProperty().setValue(false)); */
+				/*
+				 * getItems().stream().forEach(binding ->
+				 * binding.getSelectedProperty().setValue(false));
+				 */
 			}
 		});
 		return buttonNew;
 	}
 
-	/**
-	 * build the column for the selected property
-	 * @return
-	 */
-	private TableColumn<T, Boolean> buildSelectedColumn() {	
+	private TableColumn<T, Boolean> buildSelectedColumn() {
 		TableColumn<T, Boolean> selectedCol = new TableColumn<T, Boolean>("");
 		selectedCol.setId("selectedColumn");
 		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
@@ -182,20 +226,20 @@ public class TableView<T extends TableViewDataModelBinding>
 
 	public void addFont(String pathOfFont, Integer size) {
 		InputStream input = TableView.class.getResourceAsStream(pathOfFont);
-		Font font  = Font.loadFont(input, size);
+		Font font = Font.loadFont(input, size);
 		fonts.put(pathOfFont, font);
 	}
 
 	public Font getFont(String pathOfFont, Integer size) {
 		return fonts.get(pathOfFont);
 	}
-	
-	
+
 	public void addStringColumn(String name, String property) {
 		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		headerCol.getColumns().addAll(Arrays.asList(stringColumn));
+		stringColumn.setEditable(false);
 	}
 
 	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
@@ -203,6 +247,7 @@ public class TableView<T extends TableViewDataModelBinding>
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		headerCol.getColumns().add(comboBoxColumn);
+		comboBoxColumn.setEditable(false);
 	}
 
 	public Property<Number> prefHeightProperty() {
@@ -215,5 +260,5 @@ public class TableView<T extends TableViewDataModelBinding>
 
 	public Node getRootNode() {
 		return vbox;
-	}	
+	}
 }
