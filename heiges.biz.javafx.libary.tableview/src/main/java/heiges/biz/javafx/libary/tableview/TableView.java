@@ -1,12 +1,10 @@
 package heiges.biz.javafx.libary.tableview;
 
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
+import heiges.biz.javafx.libary.commons.Fonts;
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import heiges.biz.javafx.libary.tableview.cellfactories.SelectionCheckBoxCellFactory;
 import javafx.beans.property.Property;
@@ -23,15 +21,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 public class TableView<T extends TableViewDataModelBinding> {
 
 	private javafx.scene.control.TableView<T> table = null;
 
 	private VBox vbox = null;
-
-	private Map<String, Font> fonts = new HashMap<String, Font>();
 
 	/**
 	 * The main column, all other columns will be added as child columns and
@@ -52,7 +47,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		/**
 		 * Load font awesome used for build the actionButtons.
 		 */
-		loadFontAwesome();
+		Fonts.addFont("/fa/fontawesome-webfont.ttf", 15);
 
 		/**
 		 * Build the table and the wrapping vbox for the table.
@@ -122,15 +117,15 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 	private Button buildEditButton() {
 		Label editLabel = new Label("\uF044");
-		editLabel.setFont(getFont("/fa/fontawesome-webfont.ttf", 15));
+		editLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button editButton = new Button("", editLabel);
 		editButton.setId("editButton");
-		editButton.setOnAction(new EventHandler<ActionEvent>() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void handle(ActionEvent e) {
-			}
-		});
+//		editButton.setOnAction(new EventHandler<ActionEvent>() {
+//			@SuppressWarnings("unchecked")
+//			@Override
+//			public void handle(ActionEvent e) {
+//			}
+//		});
 		return editButton;
 	}
 
@@ -141,7 +136,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 */
 	private Button buildDeleteButton() {
 		Label deleteLabel = new Label("\uF014");
-		deleteLabel.setFont(getFont("/fa/fontawesome-webfont.ttf", 15));
+		deleteLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button buttonDelete = new Button("", deleteLabel);
 		buttonDelete.setId("deleteElementButton");
 		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
@@ -189,7 +184,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 */
 	private Button buildNewButton(ItemFactory factory, CheckBox selectAll) {
 		Label newLabel = new Label("\uF067");
-		newLabel.setFont(getFont("/fa/fontawesome-webfont.ttf", 15));
+		newLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button buttonNew = new Button("", newLabel);
 		buttonNew.setId("newElementButton");
 		buttonNew.setOnAction(new EventHandler<ActionEvent>() {
@@ -218,20 +213,6 @@ public class TableView<T extends TableViewDataModelBinding> {
 		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
 		selectedCol.setSortable(false);
 		return selectedCol;
-	}
-
-	private void loadFontAwesome() {
-		addFont("/fa/fontawesome-webfont.ttf", 15);
-	}
-
-	public void addFont(String pathOfFont, Integer size) {
-		InputStream input = TableView.class.getResourceAsStream(pathOfFont);
-		Font font = Font.loadFont(input, size);
-		fonts.put(pathOfFont, font);
-	}
-
-	public Font getFont(String pathOfFont, Integer size) {
-		return fonts.get(pathOfFont);
 	}
 
 	public void addStringColumn(String name, String property) {
