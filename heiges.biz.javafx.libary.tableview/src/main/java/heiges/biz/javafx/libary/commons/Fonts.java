@@ -13,11 +13,13 @@ public class Fonts {
 	
 	public static Font getFont(String pathOfFont, Integer size) {
 		Font font = fonts.get(pathOfFont+String.valueOf(size));
-		if (font == null) throw new IllegalStateException("Font " + pathOfFont + " size " + size + " not found!");
-		return font;
+		if (font == null) {
+			addFont(pathOfFont, size);
+		}
+		return fonts.get(pathOfFont+String.valueOf(size));
 	}
 	
-	public static void addFont(String pathOfFont, Integer size) {
+	private static void addFont(String pathOfFont, Integer size) {
 		InputStream input = TableView.class.getResourceAsStream(pathOfFont);
 		Font font = Font.loadFont(input, size);
 		fonts.put(pathOfFont+String.valueOf(size), font);

@@ -57,10 +57,12 @@ public class TestTableView extends Application {
 		super.stop();
 	
 		for (TestTableViewBinding testTableViewBinding : data) {
-			System.out.println(testTableViewBinding.getField1StringProperty() 
-					+ " - " + testTableViewBinding.getField2StringProperty() 
-					+ " - " + testTableViewBinding.getStringProperty()
-					+ " - " + testTableViewBinding.getComboBoxListProperty());
+			System.out.println(
+					testTableViewBinding.getSelectedProperty()
+					+ " - " + testTableViewBinding.getComboBoxListProperty() 
+					+ " - " + testTableViewBinding.getField1StringProperty() 
+					+ " - " + testTableViewBinding.getField2StringProperty()
+					+ " - " + testTableViewBinding.getStringProperty());
 		}
 	}
 	

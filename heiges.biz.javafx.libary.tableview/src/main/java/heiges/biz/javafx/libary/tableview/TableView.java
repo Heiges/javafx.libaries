@@ -28,6 +28,10 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 	private VBox vbox = null;
 
+	ObservableList<T> items;
+
+	private CheckBox selectAllRowsCheckBox = null;
+
 	/**
 	 * The main column, all other columns will be added as child columns and
 	 * will be arranged below the main column. The main column will be used for
@@ -43,12 +47,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 * @param factory
 	 */
 	public TableView(ObservableList<T> items, ItemFactory factory) {
-
-		/**
-		 * Load font awesome used for build the actionButtons.
-		 */
-		Fonts.addFont("/fa/fontawesome-webfont.ttf", 15);
-
+		this.items = items;
 		/**
 		 * Build the table and the wrapping vbox for the table.
 		 */
@@ -72,20 +71,25 @@ public class TableView<T extends TableViewDataModelBinding> {
 		table.getColumns().add(headerCol);
 
 		/**
+		 * Build the selection box and the SelectionBoxCellFactory. The
+		 * SelectionBoxCellFactory will need the selection box for construction.
+		 */
+		selectAllRowsCheckBox = buildSelectAllRowsCheckBox();
+		SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory = new SelectionCheckBoxCellFactory<T>(selectAllRowsCheckBox);
+
+		/**
 		 * Build the selectARowColumn. This is the first column and will display
 		 * the selectIt action button for selecting or unselecting a row
 		 */
 		TableColumn<T, Boolean> selectARowColumn = buildSelectedColumn();
-		SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory = new SelectionCheckBoxCellFactory<T>();
 		selectARowColumn.setCellFactory(selectionCheckBoxCellFactory);
 		headerCol.getColumns().addAll(Arrays.asList(selectARowColumn));
 
 		/**
-		 * Build the selectAllRows checkbox and add it to the selectARowColumn
-		 * column header. The checkBox will be connected with the checkBox cellFactory for
-		 * displaying the state of the checkbox.
+		 * Add selectAllRows check box to the selectARowColumn column header.
+		 * The checkBox will be connected with the checkBox cellFactory for
+		 * displaying the state of the check box.
 		 */
-		CheckBox selectAllRowsCheckBox = buildSelectAllRowsCheckBox(selectARowColumn, selectionCheckBoxCellFactory);
 		HBox selectARowColumnHeaderBox = new HBox();
 		HBox.setMargin(selectAllRowsCheckBox, new Insets(5, 0, 5, 5));
 		selectARowColumnHeaderBox.setAlignment(Pos.CENTER_RIGHT);
@@ -120,12 +124,12 @@ public class TableView<T extends TableViewDataModelBinding> {
 		editLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button editButton = new Button("", editLabel);
 		editButton.setId("editButton");
-//		editButton.setOnAction(new EventHandler<ActionEvent>() {
-//			@SuppressWarnings("unchecked")
-//			@Override
-//			public void handle(ActionEvent e) {
-//			}
-//		});
+		// editButton.setOnAction(new EventHandler<ActionEvent>() {
+		// @SuppressWarnings("unchecked")
+		// @Override
+		// public void handle(ActionEvent e) {
+		// }
+		// });
 		return editButton;
 	}
 
@@ -139,40 +143,56 @@ public class TableView<T extends TableViewDataModelBinding> {
 		deleteLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button buttonDelete = new Button("", deleteLabel);
 		buttonDelete.setId("deleteElementButton");
+
+		/**
+		 * Build the behavior when the delete button is clicked. All selected
+		 * rows in the table will be deleted and the selectAllCheckBox will be
+		 * set to false.
+		 */
 		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
+
 			@Override
 			public void handle(ActionEvent e) {
-				Iterator<T> itemsIterator = table.getItems().iterator();
+
+				ObservableList<T> items = table.getItems();
+				Iterator<T> itemsIterator = items.iterator();
 				while (itemsIterator.hasNext()) {
 					T binding = (T) itemsIterator.next();
 					if (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
 						itemsIterator.remove();
 					}
 				}
+
+				if (items.size() == 0)
+					selectAllRowsCheckBox.selectedProperty().set(false);
 			}
 		});
 		return buttonDelete;
 	}
 
 	/**
-	 * build the checkbox selectAll
+	 * build the check box selectAllRowsButton.
 	 * 
 	 * @param selectedCol
 	 * @param selectionCheckBoxCellFactory
 	 * @return
 	 */
-	private CheckBox buildSelectAllRowsCheckBox(TableColumn<T, Boolean> selectedCol,
-			SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory) {
-		CheckBox selectAll = new CheckBox();
-		selectAll.setId("selectAllCheckBox");
-		selectAll.setOnAction(new EventHandler<ActionEvent>() {
+	private CheckBox buildSelectAllRowsCheckBox() {
+
+		CheckBox selectAllRows = new CheckBox();
+		selectAllRows.setId("selectAllCheckBox");
+
+		/**
+		 * Build the behavior when the selectAllRows is clicked.
+		 */
+		selectAllRows.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				table.getItems().stream().forEach(binding -> binding.getSelectedProperty().set(selectAll.isSelected()));
+				items.stream().forEach(binding -> binding.getSelectedProperty().set(selectAllRows.isSelected()));
 			}
 		});
-		selectionCheckBoxCellFactory.setSelectAll(selectAll);
-		return selectAll;
+
+		return selectAllRows;
 	}
 
 	/**
@@ -193,7 +213,8 @@ public class TableView<T extends TableViewDataModelBinding> {
 			public void handle(ActionEvent e) {
 				table.getItems().add((T) factory.build());
 
-				// after adding an item the checkbox selectAll must be unchecked
+				// after adding an item the check box selectAll must be
+				// unchecked
 				selectAll.setSelected(false);
 
 				// if after adding an item all other items must be unselected
@@ -220,7 +241,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		headerCol.getColumns().addAll(Arrays.asList(stringColumn));
-		stringColumn.setEditable(false);
+		// stringColumn.setEditable(false);
 	}
 
 	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
@@ -228,7 +249,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		headerCol.getColumns().add(comboBoxColumn);
-		comboBoxColumn.setEditable(false);
+		// comboBoxColumn.setEditable(false);
 	}
 
 	public Property<Number> prefHeightProperty() {

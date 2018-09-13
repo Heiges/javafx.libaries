@@ -35,18 +35,19 @@ public class ComboBoxCellFactory<T extends TableViewDataModelBinding> implements
 				} 
 				else {
 					
-					getItems().clear();
-					getItems().addAll(FXCollections.observableArrayList(comboBoxList));
-
-					if (comboBoxList.contains(item) == false) {
-						System.out.println(item);
-						comboBoxList.add(item);
-					}
+					// FIXME totally wrong place to do this!
+//					getItems().clear();
+//					getItems().addAll(FXCollections.observableArrayList(comboBoxList));
+//
+//					if (comboBoxList.contains(item) == false) {
+////						System.out.println(item);
+//						comboBoxList.add(item);
+//					}
 				}
 			}
 		};
 
-		cell.setComboBoxEditable(true);
+//		cell.setComboBoxEditable(true);
 
 		cell.getItems().addAll(FXCollections.observableArrayList(comboBoxList));
 
