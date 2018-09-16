@@ -263,6 +263,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		return selectedCol;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addStringColumn(String name, String property) {
 		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -279,6 +280,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
 		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
