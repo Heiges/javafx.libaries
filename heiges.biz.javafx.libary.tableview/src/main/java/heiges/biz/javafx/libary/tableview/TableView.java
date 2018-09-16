@@ -1,12 +1,13 @@
 package heiges.biz.javafx.libary.tableview;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import heiges.biz.javafx.libary.commons.Fonts;
+import heiges.biz.javafx.libary.tableview.cellfactories.ActionCellFactory;
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
-import heiges.biz.javafx.libary.tableview.cellfactories.SelectionCheckBoxCellFactory;
+import heiges.biz.javafx.libary.tableview.cellfactories.SelectThisRowCellFactory;
 import javafx.beans.property.Property;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,6 +27,13 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 	private javafx.scene.control.TableView<T> table = null;
 
+	private TableColumn<T, Boolean> selectARowColumn = null;
+	
+	private TableColumn<T, Boolean> actionCol = null;
+	
+	@SuppressWarnings("rawtypes")
+	private List columns = new ArrayList<TableColumn>();
+	
 	private VBox vbox = null;
 
 	ObservableList<T> items;
@@ -75,16 +83,30 @@ public class TableView<T extends TableViewDataModelBinding> {
 		 * SelectionBoxCellFactory will need the selection box for construction.
 		 */
 		selectAllRowsCheckBox = buildSelectAllRowsCheckBox();
-		SelectionCheckBoxCellFactory<T> selectionCheckBoxCellFactory = new SelectionCheckBoxCellFactory<T>(selectAllRowsCheckBox);
+		SelectThisRowCellFactory<T> selectionCheckBoxCellFactory = new SelectThisRowCellFactory<T>(selectAllRowsCheckBox);
 
 		/**
 		 * Build the selectARowColumn. This is the first column and will display
 		 * the selectIt action button for selecting or unselecting a row
 		 */
-		TableColumn<T, Boolean> selectARowColumn = buildSelectedColumn();
+		selectARowColumn = buildSelectedColumn();
 		selectARowColumn.setCellFactory(selectionCheckBoxCellFactory);
-		headerCol.getColumns().addAll(Arrays.asList(selectARowColumn));
+		
 
+		
+		//NEU
+		// FIXME what is the correkt Type for a row with buttons only?
+		actionCol = new TableColumn<T, Boolean>("");
+		actionCol.setId("actionCol");
+		ActionCellFactory<T> actionCellFactory = new ActionCellFactory<T>();
+		// FIXME get a property to bind for our actions
+		actionCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
+		actionCol.setCellFactory(actionCellFactory);
+		actionCol.setSortable(false);
+		
+		// FIXME remove after rebuilding addColumnsXXX
+		//headerCol.getColumns().addAll(Arrays.asList(selectARowColumn, actionCol));	
+		
 		/**
 		 * Add selectAllRows check box to the selectARowColumn column header.
 		 * The checkBox will be connected with the checkBox cellFactory for
@@ -120,17 +142,22 @@ public class TableView<T extends TableViewDataModelBinding> {
 	}
 
 	private Button buildEditButton() {
-		Label editLabel = new Label("\uF044");
+		Label editLabel = new Label("\uF023");
 		editLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button editButton = new Button("", editLabel);
 		editButton.setId("editButton");
-		// editButton.setOnAction(new EventHandler<ActionEvent>() {
-		// @SuppressWarnings("unchecked")
-		// @Override
-		// public void handle(ActionEvent e) {
-		// }
-		// });
+		editButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				
+				
+				
+			}
+		});
 		return editButton;
+		
+		// F023 Closed Lock
+		// F009 Open Lock
 	}
 
 	/**
@@ -240,16 +267,32 @@ public class TableView<T extends TableViewDataModelBinding> {
 		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
-		headerCol.getColumns().addAll(Arrays.asList(stringColumn));
-		// stringColumn.setEditable(false);
+		
+		columns.add(stringColumn);
+		
+		headerCol.getColumns().clear();
+		headerCol.getColumns().add(selectARowColumn);
+		headerCol.getColumns().addAll(columns);
+		headerCol.getColumns().add(actionCol);
+
+		stringColumn.setEditable(false);
 	}
 
+	
 	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
 		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
-		headerCol.getColumns().add(comboBoxColumn);
-		// comboBoxColumn.setEditable(false);
+		
+
+		columns.add(comboBoxColumn);
+		
+		headerCol.getColumns().clear();
+		headerCol.getColumns().add(selectARowColumn);
+		headerCol.getColumns().addAll(columns);
+		headerCol.getColumns().add(actionCol);
+		
+		 comboBoxColumn.setEditable(false);
 	}
 
 	public Property<Number> prefHeightProperty() {

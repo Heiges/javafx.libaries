@@ -2,14 +2,10 @@ package heiges.biz.javafx.libary.tableview.cell;
 
 import heiges.biz.javafx.libary.commons.Fonts;
 import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.input.MouseEvent;
@@ -19,119 +15,65 @@ import javafx.scene.text.Font;
 public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCell<S, T> {
 
 	private HBox actionBox = new HBox();
+	
+	private Button editThisRowButton = null;
+	
+	private Button detailViewButton = null;
 
-	private CheckBox selectThisRow = null;
+	public ActionCell() {
+		
+		
+		/**
+		 * Build the detail view button
+		 */
+		Font font = Fonts.getFont("/fa/fontawesome-webfont.ttf", 15);
+		Label detailViewLabel = new Label("\uF002");
+		detailViewLabel.setFont(font);
+		detailViewButton = new Button("", detailViewLabel);
+//		detailViewButton.setAlignment(Pos.CENTER_LEFT);
+		detailViewButton.setStyle("-fx-background-color: transparent;");
 
-	private Boolean isMouseStillInCell = false;
-
-	public ActionCell(CheckBox selectAllRows) {
 
 		/**
 		 * Build the editThisRow button
 		 */
-		Font font = Fonts.getFont("/fa/fontawesome-webfont.ttf", 15);
 		Label editLabel = new Label("\uF044");
 		editLabel.setFont(font);
-		Button editThisRowButton = new Button("", editLabel);
-		editThisRowButton.setAlignment(Pos.CENTER_RIGHT);
+		editThisRowButton = new Button("", editLabel);
+//		editThisRowButton.setAlignment(Pos.CENTER_LEFT);
 		editThisRowButton.setStyle("-fx-background-color: transparent;");
-
-		/**
-		 * Build the selectThisRow check box
-		 */
-		selectThisRow = new CheckBox();
-		selectThisRow.setAlignment(Pos.CENTER_RIGHT);
 
 		/**
 		 * Build the action box with all needed buttons.
 		 */
 		HBox.setMargin(editThisRowButton, new Insets(0, 0, 0, 0));
-		HBox.setMargin(selectThisRow, new Insets(0, 0, 0, 0));
-		actionBox.setAlignment(Pos.CENTER_RIGHT);
-		actionBox.getChildren().addAll(editThisRowButton, selectThisRow);
+		actionBox.setAlignment(Pos.CENTER_LEFT);
+		actionBox.getChildren().addAll(detailViewButton, editThisRowButton);
 
 		/**
 		 * Set all buttons to invisible.
 		 */
-		editThisRowButton.setVisible(false);
-		selectThisRow.setVisible(false);
+		setVisibiltyOfAllButtons(false);
 
-		buildBehaviorForSelectThisRowPropertyChanged(selectAllRows);
+		buildBehaviorForSetOnMouseEntered(actionBox);
 
-		buildBehaviorForSetOnMouseEntered(editThisRowButton);
-
-		buildBehaviorForSetOnMouseExited(editThisRowButton);
+		buildBehaviorForSetOnMouseExited(actionBox);
 	}
 
-	/**
-	 * Build the behavior when the selectThisRow check box has been changed. The
-	 * position of the mouse pointer must be considered because the check box
-	 * must stay visibility when the mouse pointer is still over the cell.
-	 */
-	private void buildBehaviorForSelectThisRowPropertyChanged(CheckBox selectAllRows) {
-
-		selectThisRow.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-
-				/**
-				 * Update the underlying tableViewDataModelBinding with the new
-				 * value.
-				 */
-				TableViewDataModelBinding binding = (TableViewDataModelBinding) getTableRow().getItem();
-				if (binding != null) {
-					binding.getSelectedProperty().setValue(selectThisRow.selectedProperty().getValue());
-				}
-
-				/**
-				 * Set the visibility of the selectThisRow check box. The
-				 * position of the mouse pointer must be considered because the
-				 * check box must stay visibility when the mouse pointer is
-				 * still over the cell.
-				 */
-				if (isMouseStillInCell) {
-					selectThisRow.setVisible(Boolean.valueOf(true));
-				} else {
-					selectThisRow.setVisible(Boolean.valueOf(newValue));
-				}
-
-				updateAllRowsAreSelectedCheckBox(selectAllRows);
-			}
-		});
-	}
-
-	/**
-	 * Update the allRowsAreSelected check box. Set the allRowsAreSelected to
-	 * true if all rows are selected now or to false if a single row is not
-	 * selected.
-	 * 
-	 * @param selectAllRows
-	 */
-	private void updateAllRowsAreSelectedCheckBox(CheckBox selectAllRows) {
-
-		ObservableList<S> items = getTableView().getItems();
-		// FIXME use lambda for this
-		boolean allRowsAreSelected = true;
-		for (S item : items) {
-			if (item.getSelectedProperty().getValue() == false) {
-				allRowsAreSelected = false;
-				break;
-			}
-		}
-		selectAllRows.selectedProperty().set(allRowsAreSelected);
+	private void setVisibiltyOfAllButtons(boolean visibility) {
+		editThisRowButton.setVisible(visibility);
+		detailViewButton.setVisible(visibility);
 	}
 
 	/**
 	 * Set the visibility of all buttons when the mouse enters the cell.
 	 */
-	private void buildBehaviorForSetOnMouseEntered(Button editThisRowButton) {
+	private void buildBehaviorForSetOnMouseEntered(HBox actionbox) {
 
 		setOnMouseEntered(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				isMouseStillInCell = true;
-				editThisRowButton.setVisible(true);
-				selectThisRow.setVisible(true);
+				setVisibiltyOfAllButtons(true);
 			}
 		});
 	}
@@ -139,15 +81,12 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 	/**
 	 * Set the visibility of all buttons when the mouse leaves the cell.
 	 */
-	private void buildBehaviorForSetOnMouseExited(Button editThisRowButton) {
+	private void buildBehaviorForSetOnMouseExited(HBox actionbox) {
 
 		setOnMouseExited(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				isMouseStillInCell = false;
-				editThisRowButton.setVisible(false);
-				if (selectThisRow.isSelected() == false)
-					selectThisRow.setVisible(false);
+				setVisibiltyOfAllButtons(false);
 			}
 		});
 	}
@@ -165,8 +104,6 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 
 			setText(null);
 			setGraphic(actionBox);
-
-			if (item instanceof Boolean) selectThisRow.selectedProperty().set((Boolean) item);
 		}
 	}
 }

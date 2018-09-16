@@ -1,13 +1,13 @@
 package heiges.biz.javafx.libary.tableview.cellfactories;
 
 import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
-import heiges.biz.javafx.libary.tableview.cell.ActionCell;
+import heiges.biz.javafx.libary.tableview.cell.SelectThisRowCell;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
 
-public class SelectionCheckBoxCellFactory<T extends TableViewDataModelBinding>
+public class SelectThisRowCellFactory<T extends TableViewDataModelBinding>
 		implements Callback<TableColumn<T, Boolean>, TableCell<T, Boolean>> {
 
 	/**
@@ -25,7 +25,7 @@ public class SelectionCheckBoxCellFactory<T extends TableViewDataModelBinding>
 	 *            the table itself and handed over to this
 	 *            SelectionBoxCellFactory.
 	 */
-	public SelectionCheckBoxCellFactory(CheckBox selectAllRowsInTable) {
+	public SelectThisRowCellFactory(CheckBox selectAllRowsInTable) {
 
 		this.selectAllRowsInTable = selectAllRowsInTable;
 	}
@@ -36,6 +36,6 @@ public class SelectionCheckBoxCellFactory<T extends TableViewDataModelBinding>
 		/**
 		 * Build the cell with the delegate to the selectAllRowsInTable.
 		 */
-		return new ActionCell<T, Boolean>(selectAllRowsInTable);	
+		return new SelectThisRowCell<T, Boolean>(selectAllRowsInTable);	
 	}
 }
