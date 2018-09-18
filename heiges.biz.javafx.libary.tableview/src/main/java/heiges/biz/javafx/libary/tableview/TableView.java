@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -267,34 +268,39 @@ public class TableView<T extends TableViewDataModelBinding> {
 	public void addStringColumn(String name, String property) {
 		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
-		
+		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));	
 		columns.add(stringColumn);
-		
-		headerCol.getColumns().clear();
-		headerCol.getColumns().add(selectARowColumn);
-		headerCol.getColumns().addAll(columns);
-		headerCol.getColumns().add(actionCol);
-
+		sortColumns();
 		stringColumn.setEditable(false);
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
 		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
-		
-
 		columns.add(comboBoxColumn);
-		
+		sortColumns();
+		comboBoxColumn.setEditable(false);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void addCheckBoxColumn(String name, String property) {
+		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
+		comboBoxColumn.setCellFactory(column -> new CheckBoxTableCell<>());
+		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
+		columns.add(comboBoxColumn);
+		sortColumns();
+//		comboBoxColumn.setEditable(false);
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	private void sortColumns() {
 		headerCol.getColumns().clear();
 		headerCol.getColumns().add(selectARowColumn);
 		headerCol.getColumns().addAll(columns);
 		headerCol.getColumns().add(actionCol);
-		
-		 comboBoxColumn.setEditable(false);
 	}
 
 	public Property<Number> prefHeightProperty() {

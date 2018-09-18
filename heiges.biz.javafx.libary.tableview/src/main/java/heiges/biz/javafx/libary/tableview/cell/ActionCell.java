@@ -12,6 +12,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 
+/**
+ * 
+ * @author Hansjoachim Heiges
+ *
+ * @param <S>
+ * @param <T>
+ */
 public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCell<S, T> {
 
 	private HBox actionBox = new HBox();
@@ -19,33 +26,19 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 	private Button editThisRowButton = null;
 	
 	private Button detailViewButton = null;
+	
+	private Font font = null;
 
 	public ActionCell() {
 		
-		
-		/**
-		 * Build the detail view button
-		 */
-		Font font = Fonts.getFont("/fa/fontawesome-webfont.ttf", 15);
-		Label detailViewLabel = new Label("\uF002");
-		detailViewLabel.setFont(font);
-		detailViewButton = new Button("", detailViewLabel);
-//		detailViewButton.setAlignment(Pos.CENTER_LEFT);
-		detailViewButton.setStyle("-fx-background-color: transparent;");
+		font = Fonts.getFont("/fa/fontawesome-webfont.ttf", 15);
 
+		buildDetailViewButton();
 
-		/**
-		 * Build the editThisRow button
-		 */
-		Label editLabel = new Label("\uF044");
-		editLabel.setFont(font);
-		editThisRowButton = new Button("", editLabel);
-//		editThisRowButton.setAlignment(Pos.CENTER_LEFT);
-		editThisRowButton.setStyle("-fx-background-color: transparent;");
+		buildEditThisRowButton();
 
-		/**
-		 * Build the action box with all needed buttons.
-		 */
+		// Build the action box with all needed buttons.
+		HBox.setMargin(detailViewButton, new Insets(0, 0, 0, 0));
 		HBox.setMargin(editThisRowButton, new Insets(0, 0, 0, 0));
 		actionBox.setAlignment(Pos.CENTER_LEFT);
 		actionBox.getChildren().addAll(detailViewButton, editThisRowButton);
@@ -58,6 +51,30 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 		buildBehaviorForSetOnMouseEntered(actionBox);
 
 		buildBehaviorForSetOnMouseExited(actionBox);
+	}
+
+	/**
+	 * Build the editThisRow button
+	 */
+	private void buildEditThisRowButton() {
+		Label editLabel = new Label("\uF044");
+		editLabel.setFont(font);
+		editThisRowButton = new Button("", editLabel);
+		editThisRowButton.setAlignment(Pos.CENTER_LEFT);
+		editThisRowButton.setStyle("-fx-background-color: transparent;");
+		editThisRowButton.setPadding(Insets.EMPTY);
+	}
+
+	/**
+	 * Build the detail view button
+	 */
+	private void  buildDetailViewButton() {
+		Label detailViewLabel = new Label("\uF002");
+		detailViewLabel.setFont(font);
+		detailViewButton = new Button("", detailViewLabel);
+		detailViewButton.setAlignment(Pos.CENTER_LEFT);
+		detailViewButton.setStyle("-fx-background-color: transparent;");
+		detailViewButton.setPadding(new Insets(0,5,0,5));
 	}
 
 	private void setVisibiltyOfAllButtons(boolean visibility) {

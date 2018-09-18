@@ -1,6 +1,7 @@
 package biz.heiges.javafx.libary.tableview.test;
 
 import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class TestTableViewBinding extends TableViewDataModelBinding {
@@ -12,6 +13,18 @@ public class TestTableViewBinding extends TableViewDataModelBinding {
 	private SimpleStringProperty stringProperty = new SimpleStringProperty("enter a value");
 	
 	private SimpleStringProperty comboBoxListProperty = new SimpleStringProperty("select a value");
+	
+	private SimpleBooleanProperty booleanField1 = new SimpleBooleanProperty(false);
+	
+	public void setField1BooleanProperty(Boolean value) {
+		this.booleanField1 = new SimpleBooleanProperty(value);
+	}
+	
+	public SimpleBooleanProperty getField1BooleanProperty() {
+		return booleanField1;
+	}
+	
+	
 	
 	public void setStringProperty(String value) {
 		this.stringProperty = new SimpleStringProperty(value);

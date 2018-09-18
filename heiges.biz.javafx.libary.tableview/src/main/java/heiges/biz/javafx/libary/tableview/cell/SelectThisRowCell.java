@@ -27,14 +27,16 @@ public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends T
 		 */
 		selectThisRow = new CheckBox();
 		selectThisRow.setAlignment(Pos.CENTER_RIGHT);
+		
+
 
 		/**
 		 * Build the action box with all needed buttons.
 		 */
 		HBox.setMargin(selectThisRow, new Insets(0, 0, 0, 0));
 		actionBox.setAlignment(Pos.CENTER_RIGHT);
-		actionBox.getChildren().addAll(/*editThisRowButton,*/ selectThisRow);
-		
+		actionBox.getChildren().addAll(/* editThisRowButton, */ selectThisRow);
+
 		selectThisRow.setVisible(false);
 
 		buildBehaviorForSelectThisRowPropertyChanged(selectAllRows);
@@ -55,21 +57,17 @@ public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends T
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 
-				/**
-				 * Update the underlying tableViewDataModelBinding with the new
-				 * value.
-				 */
+				// Update the underlying tableViewDataModelBinding with the new
+				// value.
 				TableViewDataModelBinding binding = (TableViewDataModelBinding) getTableRow().getItem();
 				if (binding != null) {
 					binding.getSelectedProperty().setValue(selectThisRow.selectedProperty().getValue());
 				}
 
-				/**
-				 * Set the visibility of the selectThisRow check box. The
-				 * position of the mouse pointer must be considered because the
-				 * check box must stay visibility when the mouse pointer is
-				 * still over the cell.
-				 */
+				// Set the visibility of the selectThisRow check box. The
+				// position of the mouse pointer must be considered because the
+				// check box must stay visibility when the mouse pointer is
+				// still over the cell.
 				if (isMouseStillInCell) {
 					selectThisRow.setVisible(Boolean.valueOf(true));
 				} else {
@@ -131,6 +129,8 @@ public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends T
 		});
 	}
 
+
+   /** {@inheritDoc} */
 	@Override
 	protected void updateItem(T item, boolean empty) {
 
@@ -145,7 +145,8 @@ public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends T
 			setText(null);
 			setGraphic(actionBox);
 
-			if (item instanceof Boolean) selectThisRow.selectedProperty().set((Boolean) item);
+			if (item instanceof Boolean)
+				selectThisRow.selectedProperty().set((Boolean) item);
 		}
-	}
+	}	
 }

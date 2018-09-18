@@ -41,7 +41,7 @@ public class TestTableView extends Application {
 		table.prefWidthProperty().bind(primaryBox.widthProperty());
 		
 		table.addComboBoxColumn("ComboBoxList", buildComboBoxList(), "ComboBoxListProperty");
-		table.addStringColumn("Spalte 1", "Field1StringProperty");
+		table.addCheckBoxColumn("Spalte 1", "Field1BooleanProperty");
 		table.addStringColumn("Spalte 2", "Field2StringProperty");
 		table.addStringColumn("Spalte 3", "StringProperty");
 
@@ -60,6 +60,7 @@ public class TestTableView extends Application {
 			System.out.println(
 					testTableViewBinding.getSelectedProperty()
 					+ " - " + testTableViewBinding.getComboBoxListProperty() 
+					+ " - " + testTableViewBinding.getField1BooleanProperty() 					
 					+ " - " + testTableViewBinding.getField1StringProperty() 
 					+ " - " + testTableViewBinding.getField2StringProperty()
 					+ " - " + testTableViewBinding.getStringProperty());
