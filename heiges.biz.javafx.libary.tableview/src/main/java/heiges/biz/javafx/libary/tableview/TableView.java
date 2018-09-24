@@ -29,12 +29,12 @@ public class TableView<T extends TableViewDataModelBinding> {
 	private javafx.scene.control.TableView<T> table = null;
 
 	private TableColumn<T, Boolean> selectARowColumn = null;
-	
+
 	private TableColumn<T, Boolean> actionCol = null;
-	
+
 	@SuppressWarnings("rawtypes")
 	private List columns = new ArrayList<TableColumn>();
-	
+
 	private VBox vbox = null;
 
 	ObservableList<T> items;
@@ -42,11 +42,11 @@ public class TableView<T extends TableViewDataModelBinding> {
 	private CheckBox selectAllRowsCheckBox = null;
 
 	/**
-	 * The main column, all other columns will be added as child columns and
-	 * will be arranged below the main column. The main column will be used for
-	 * all action buttons the affect all items (rows) in the table or the table
-	 * itself (e.g. the delete button will only affect selected rows while the
-	 * new button will add a new item to the table
+	 * The main column, all other columns will be added as child columns and will be
+	 * arranged below the main column. The main column will be used for all action
+	 * buttons the affect all items (rows) in the table or the table itself (e.g.
+	 * the delete button will only affect selected rows while the new button will
+	 * add a new item to the table
 	 */
 	private TableColumn<T, String> headerCol = null;
 
@@ -56,46 +56,37 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 * @param factory
 	 */
 	public TableView(ObservableList<T> items, ItemFactory factory) {
+
 		this.items = items;
-		/**
-		 * Build the table and the wrapping vbox for the table.
-		 */
+
+		// Build the table and the wrapping vertical box for the table.
 		vbox = new VBox();
 		table = new javafx.scene.control.TableView<T>(items);
 		table.setId("tableview");
 		vbox.getChildren().add(table);
 
-		/**
-		 * Bind the height and width properties of vbox and table and set the
-		 * resize policy.
-		 */
+		// Bind the height and width properties of vbox and table and set the resize
+		// policy.
 		table.prefHeightProperty().bind(vbox.heightProperty());
 		table.prefWidthProperty().bind(vbox.widthProperty());
 		table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);
 
-		/**
-		 * Build the header column and add it to the table.
-		 */
+		// Build the header column and add it to the table.
 		headerCol = new TableColumn<T, String>("");
 		table.getColumns().add(headerCol);
 
-		/**
-		 * Build the selection box and the SelectionBoxCellFactory. The
-		 * SelectionBoxCellFactory will need the selection box for construction.
-		 */
+		// Build the selection box and the SelectionBoxCellFactory. The
+		// SelectionBoxCellFactory will need the selection box for construction.
 		selectAllRowsCheckBox = buildSelectAllRowsCheckBox();
-		SelectThisRowCellFactory<T> selectionCheckBoxCellFactory = new SelectThisRowCellFactory<T>(selectAllRowsCheckBox);
+		SelectThisRowCellFactory<T> selectionCheckBoxCellFactory = new SelectThisRowCellFactory<T>(
+				selectAllRowsCheckBox);
 
-		/**
-		 * Build the selectARowColumn. This is the first column and will display
-		 * the selectIt action button for selecting or unselecting a row
-		 */
+		// Build the selectARowColumn. This is the first column and will display the
+		// selectIt action button for selecting or unselecting a row
 		selectARowColumn = buildSelectedColumn();
 		selectARowColumn.setCellFactory(selectionCheckBoxCellFactory);
-		
 
-		
-		//NEU
+		// NEU
 		// FIXME what is the correkt Type for a row with buttons only?
 		actionCol = new TableColumn<T, Boolean>("");
 		actionCol.setId("actionCol");
@@ -104,27 +95,19 @@ public class TableView<T extends TableViewDataModelBinding> {
 		actionCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
 		actionCol.setCellFactory(actionCellFactory);
 		actionCol.setSortable(false);
-		
-		// FIXME remove after rebuilding addColumnsXXX
-		//headerCol.getColumns().addAll(Arrays.asList(selectARowColumn, actionCol));	
-		
-		/**
-		 * Add selectAllRows check box to the selectARowColumn column header.
-		 * The checkBox will be connected with the checkBox cellFactory for
-		 * displaying the state of the check box.
-		 */
+
+		// Add selectAllRows check box to the selectARowColumn column header. The
+		// checkBox will be connected with the checkBox cellFactory for displaying the
+		// state of the check box.
 		HBox selectARowColumnHeaderBox = new HBox();
 		HBox.setMargin(selectAllRowsCheckBox, new Insets(5, 0, 5, 5));
 		selectARowColumnHeaderBox.setAlignment(Pos.CENTER_RIGHT);
 		selectARowColumnHeaderBox.getChildren().addAll(selectAllRowsCheckBox);
 		selectARowColumn.setGraphic(selectARowColumnHeaderBox);
 
-		/**
-		 * Build all needed action buttons and add it to headercolumn of the
-		 * table. The selectAllRowsCheckBox will be connected with the new
-		 * action button for changing the state if a new item is added to the
-		 * table.
-		 */
+		// Build all needed action buttons and add it to headercolumn of the table. The
+		// selectAllRowsCheckBox will be connected with the new action button for
+		// changing the state if a new item is added to the table.
 		Button buttonNew = buildNewButton(factory, selectAllRowsCheckBox);
 		Button buttonDelete = buildDeleteButton();
 		Button editButton = buildEditButton();
@@ -136,13 +119,13 @@ public class TableView<T extends TableViewDataModelBinding> {
 		actionBox.getChildren().addAll(buttonNew, buttonDelete, editButton);
 		headerCol.setGraphic(actionBox);
 
-		/**
-		 * set table to editable false
-		 */
+		// set table to editable false
 		table.setEditable(true);
 	}
 
 	private Button buildEditButton() {
+		// F023 Closed Lock
+		// F009 Open Lock
 		Label editLabel = new Label("\uF023");
 		editLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button editButton = new Button("", editLabel);
@@ -150,15 +133,10 @@ public class TableView<T extends TableViewDataModelBinding> {
 		editButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				
-				
-				
+
 			}
 		});
 		return editButton;
-		
-		// F023 Closed Lock
-		// F009 Open Lock
 	}
 
 	/**
@@ -172,11 +150,8 @@ public class TableView<T extends TableViewDataModelBinding> {
 		Button buttonDelete = new Button("", deleteLabel);
 		buttonDelete.setId("deleteElementButton");
 
-		/**
-		 * Build the behavior when the delete button is clicked. All selected
-		 * rows in the table will be deleted and the selectAllCheckBox will be
-		 * set to false.
-		 */
+		// Build the behavior when the delete button is clicked. All selected rows in
+		// the table will be deleted and the selectAllCheckBox will be set to false.
 		buttonDelete.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -210,9 +185,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		CheckBox selectAllRows = new CheckBox();
 		selectAllRows.setId("selectAllCheckBox");
 
-		/**
-		 * Build the behavior when the selectAllRows is clicked.
-		 */
+		// Build the behavior when the selectAllRows is clicked.
 		selectAllRows.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -268,7 +241,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	public void addStringColumn(String name, String property) {
 		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));	
+		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(stringColumn);
 		sortColumns();
 		stringColumn.setEditable(false);
@@ -291,10 +264,9 @@ public class TableView<T extends TableViewDataModelBinding> {
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(comboBoxColumn);
 		sortColumns();
-//		comboBoxColumn.setEditable(false);
+		comboBoxColumn.setEditable(false);
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
 	private void sortColumns() {
 		headerCol.getColumns().clear();

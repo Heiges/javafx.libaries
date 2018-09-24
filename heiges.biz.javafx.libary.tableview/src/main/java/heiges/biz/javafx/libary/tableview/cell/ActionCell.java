@@ -43,9 +43,6 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 		actionBox.setAlignment(Pos.CENTER_LEFT);
 		actionBox.getChildren().addAll(detailViewButton, editThisRowButton);
 
-		/**
-		 * Set all buttons to invisible.
-		 */
 		setVisibiltyOfAllButtons(false);
 
 		buildBehaviorForSetOnMouseEntered(actionBox);
