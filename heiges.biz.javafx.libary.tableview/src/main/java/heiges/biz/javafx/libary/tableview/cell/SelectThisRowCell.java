@@ -14,7 +14,7 @@ import javafx.scene.layout.HBox;
 
 public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends TableCell<S, T> {
 
-	private HBox actionBox = new HBox();
+	private HBox box = new HBox();
 
 	private CheckBox selectThisRow = null;
 
@@ -28,20 +28,21 @@ public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends T
 
 		// the check box will be wrapped in a horizontal box, therefore the style must
 		// be applied to the box not to the checkbox.
-		actionBox.getStyleClass().add("check-box-table-cell");
+		box.getStyleClass().add("check-box-table-cell");
 
-		// Build the action box with all needed buttons.
+		// Build the horizontal box with all needed buttons.
 		HBox.setMargin(selectThisRow, new Insets(2, 0, 0, 0));
-		actionBox.setAlignment(Pos.CENTER_RIGHT);
-		actionBox.getChildren().addAll(selectThisRow);
+		box.setAlignment(Pos.CENTER_RIGHT);
+		box.getChildren().addAll(selectThisRow);
 
+		// default visibility is false - not visible
 		selectThisRow.setVisible(false);
 
 		buildBehaviorForSelectThisRowPropertyChanged(selectAllRows);
 
-		buildBehaviorForSetOnMouseEntered(actionBox);
+		buildBehaviorForSetOnMouseEntered(box);
 
-		buildBehaviorForSetOnMouseExited(actionBox);
+		buildBehaviorForSetOnMouseExited(box);
 	}
 
 	/**
@@ -139,7 +140,7 @@ public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends T
 		} else {
 
 			setText(null);
-			setGraphic(actionBox);
+			setGraphic(box);
 
 			if (item instanceof Boolean) {
 				selectThisRow.selectedProperty().set((Boolean) item);
