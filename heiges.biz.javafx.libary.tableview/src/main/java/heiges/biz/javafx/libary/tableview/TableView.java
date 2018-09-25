@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import heiges.biz.javafx.libary.commons.Fonts;
-import heiges.biz.javafx.libary.tableview.cellfactories.ActionCellFactory;
+import heiges.biz.javafx.libary.tableview.cell.ActionCell;
+import heiges.biz.javafx.libary.tableview.cell.SelectThisRowCell;
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
-import heiges.biz.javafx.libary.tableview.cellfactories.SelectThisRowCellFactory;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
@@ -92,22 +92,20 @@ public class TableView<T extends TableViewDataModelBinding> {
 		// SelectionBoxCellFactory will need the selection box for construction.
 		selectAllRowsCheckBox = buildSelectAllRowsCheckBox();
 		selectAllRowsCheckBox.setPadding(new Insets(0, 5, 0, 0));
-		SelectThisRowCellFactory<T> selectionCheckBoxCellFactory = new SelectThisRowCellFactory<T>();
 
 		// Build the selectARowColumn. This is the first column and will display the
 		// selectIt action button for selecting or unselecting a row
 		selectARowColumn = buildSelectedColumn();
-		selectARowColumn.setCellFactory(selectionCheckBoxCellFactory);
+		selectARowColumn.setCellFactory(cellFactory -> new SelectThisRowCell<>());
 
 		// NEU
 		// FIXME what is the correkt Type for a row with buttons only?
 		actionCol = new TableColumn<T, Boolean>("");
 		actionCol.setId("actionCol");
-		ActionCellFactory<T> actionCellFactory = new ActionCellFactory<T>();
 		// FIXME get a property to bind for our actions in the meantime just use
 		// selectedProperty
 		actionCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("selected"));
-		actionCol.setCellFactory(actionCellFactory);
+		actionCol.setCellFactory(cellFactory -> new ActionCell<>());
 		actionCol.setSortable(false);
 
 		// Add selectAllRows check box to the selectARowColumn column header. The
