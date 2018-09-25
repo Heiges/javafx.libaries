@@ -15,7 +15,7 @@ public abstract class TableViewDataModelBinding {
 		this.selectedProperty = new SimpleBooleanProperty(false);
 	}
 	
-	public SimpleBooleanProperty getSelectedProperty() {
+	public SimpleBooleanProperty selectedProperty() {
 		return selectedProperty;
 	}
 }

@@ -8,7 +8,10 @@ import heiges.biz.javafx.libary.commons.Fonts;
 import heiges.biz.javafx.libary.tableview.cellfactories.ActionCellFactory;
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import heiges.biz.javafx.libary.tableview.cellfactories.SelectThisRowCellFactory;
+import javafx.beans.Observable;
 import javafx.beans.property.Property;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,11 +23,21 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 
 public class TableView<T extends TableViewDataModelBinding> {
+
+	// A listener for changing an single item of the table
+	private TableView<T>.ListChangeListenerImplementation listChangeListener = null;
+
+	// An observable list with notifications when a single item in the list has been
+	// changed.
+	// Will be used together with the listChangeListener.
+	private ObservableList<T> observableItems = null;
 
 	private javafx.scene.control.TableView<T> table = null;
 
@@ -78,8 +91,8 @@ public class TableView<T extends TableViewDataModelBinding> {
 		// Build the selection box and the SelectionBoxCellFactory. The
 		// SelectionBoxCellFactory will need the selection box for construction.
 		selectAllRowsCheckBox = buildSelectAllRowsCheckBox();
-		SelectThisRowCellFactory<T> selectionCheckBoxCellFactory = new SelectThisRowCellFactory<T>(
-				selectAllRowsCheckBox);
+		selectAllRowsCheckBox.setPadding(new Insets(0, 5, 0, 0));
+		SelectThisRowCellFactory<T> selectionCheckBoxCellFactory = new SelectThisRowCellFactory<T>();
 
 		// Build the selectARowColumn. This is the first column and will display the
 		// selectIt action button for selecting or unselecting a row
@@ -91,8 +104,9 @@ public class TableView<T extends TableViewDataModelBinding> {
 		actionCol = new TableColumn<T, Boolean>("");
 		actionCol.setId("actionCol");
 		ActionCellFactory<T> actionCellFactory = new ActionCellFactory<T>();
-		// FIXME get a property to bind for our actions
-		actionCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
+		// FIXME get a property to bind for our actions in the meantime just use
+		// selectedProperty
+		actionCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("selected"));
 		actionCol.setCellFactory(actionCellFactory);
 		actionCol.setSortable(false);
 
@@ -121,6 +135,34 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 		// set table to editable false
 		table.setEditable(true);
+
+		updateObservableItems(items);
+		buildListChangeListener(items);
+		addListChangeListerToObservableItems();
+
+	}
+
+	private void addListChangeListerToObservableItems() {
+		observableItems.addListener(listChangeListener);
+	}
+
+	private void buildListChangeListener(ObservableList<T> items) {
+		listChangeListener = new ListChangeListenerImplementation(items);
+	}
+
+	/**
+	 * Update the observable list with the current list of items in the table view.
+	 * 
+	 * @param items the current list of items in the table view.
+	 */
+	private void updateObservableItems(ObservableList<T> items) {
+		observableItems = FXCollections.observableArrayList(new Callback<T, Observable[]>() {
+			@Override
+			public Observable[] call(T param) {
+				return new Observable[] { param.selectedProperty(), };
+			}
+		});
+		observableItems.addAll(items);
 	}
 
 	private Button buildEditButton() {
@@ -157,17 +199,26 @@ public class TableView<T extends TableViewDataModelBinding> {
 			@Override
 			public void handle(ActionEvent e) {
 
+				removeListChangeListenerFromObservableItems();
+
 				ObservableList<T> items = table.getItems();
 				Iterator<T> itemsIterator = items.iterator();
 				while (itemsIterator.hasNext()) {
 					T binding = (T) itemsIterator.next();
-					if (binding.getSelectedProperty().getValue() == Boolean.TRUE) {
+					if (binding.selectedProperty().getValue() == Boolean.TRUE) {
 						itemsIterator.remove();
 					}
 				}
 
 				if (items.size() == 0)
 					selectAllRowsCheckBox.selectedProperty().set(false);
+
+				updateObservableItems(items);
+				addListChangeListerToObservableItems();
+			}
+
+			private void removeListChangeListenerFromObservableItems() {
+				observableItems.removeListener(listChangeListener);
 			}
 		});
 		return buttonDelete;
@@ -183,13 +234,18 @@ public class TableView<T extends TableViewDataModelBinding> {
 	private CheckBox buildSelectAllRowsCheckBox() {
 
 		CheckBox selectAllRows = new CheckBox();
-		selectAllRows.setId("selectAllCheckBox");
 
 		// Build the behavior when the selectAllRows is clicked.
 		selectAllRows.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				items.stream().forEach(binding -> binding.getSelectedProperty().set(selectAllRows.isSelected()));
+
+				observableItems.removeListener(listChangeListener);
+
+				items.stream().forEach(binding -> binding.selectedProperty().set(selectAllRows.isSelected()));
+
+
+				addListChangeListerToObservableItems();
 			}
 		});
 
@@ -207,23 +263,22 @@ public class TableView<T extends TableViewDataModelBinding> {
 		Label newLabel = new Label("\uF067");
 		newLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
 		Button buttonNew = new Button("", newLabel);
-		buttonNew.setId("newElementButton");
 		buttonNew.setOnAction(new EventHandler<ActionEvent>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void handle(ActionEvent e) {
+
+				observableItems.removeListener(listChangeListener);
+
 				table.getItems().add((T) factory.build());
 
 				// after adding an item the check box selectAll must be
 				// unchecked
 				selectAll.setSelected(false);
 
-				// if after adding an item all other items must be unselected
-				// do it here with the following code snippet
-				/*
-				 * getItems().stream().forEach(binding ->
-				 * binding.getSelectedProperty().setValue(false));
-				 */
+				updateObservableItems(items);
+
+				addListChangeListerToObservableItems();
 			}
 		});
 		return buttonNew;
@@ -231,8 +286,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 	private TableColumn<T, Boolean> buildSelectedColumn() {
 		TableColumn<T, Boolean> selectedCol = new TableColumn<T, Boolean>("");
-		selectedCol.setId("selectedColumn");
-		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("SelectedProperty"));
+		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("selected"));
 		selectedCol.setSortable(false);
 		return selectedCol;
 	}
@@ -244,7 +298,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(stringColumn);
 		sortColumns();
-		stringColumn.setEditable(false);
+//		stringColumn.setEditable(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -254,7 +308,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(comboBoxColumn);
 		sortColumns();
-		comboBoxColumn.setEditable(false);
+//		comboBoxColumn.setEditable(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -264,7 +318,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(comboBoxColumn);
 		sortColumns();
-		comboBoxColumn.setEditable(false);
+//		comboBoxColumn.setEditable(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -285,5 +339,38 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 	public Node getRootNode() {
 		return vbox;
+	}
+
+	/**
+	 * 
+	 * @author Hansjoachim Heiges
+	 *
+	 */
+	private final class ListChangeListenerImplementation implements ListChangeListener<T> {
+
+		private final ObservableList<T> items;
+
+		private ListChangeListenerImplementation(ObservableList<T> items) {
+			this.items = items;
+		}
+
+		@Override
+		public void onChanged(Change<? extends T> c) {
+			while (c.next()) {
+				if (c.wasUpdated()) {
+					for (int i = c.getFrom(); i < c.getTo(); ++i) {
+
+						boolean allRowsAreSelected = true;
+						for (T item : items) {
+							if (item.selectedProperty().getValue() == false) {
+								allRowsAreSelected = false;
+								break;
+							}
+						}
+						selectAllRowsCheckBox.selectedProperty().set(allRowsAreSelected);
+					}
+				} 
+			}
+		}
 	}
 }

@@ -10,11 +10,7 @@ import javafx.util.Callback;
 public class SelectThisRowCellFactory<T extends TableViewDataModelBinding>
 		implements Callback<TableColumn<T, Boolean>, TableCell<T, Boolean>> {
 
-	/**
-	 * The check box that delegate to the check box in the table.
-	 * 
-	 */
-	private CheckBox selectAllRowsInTable = null;
+
 
 	/**
 	 * Build the SelectionBoxCellFactory.
@@ -25,9 +21,9 @@ public class SelectThisRowCellFactory<T extends TableViewDataModelBinding>
 	 *            the table itself and handed over to this
 	 *            SelectionBoxCellFactory.
 	 */
-	public SelectThisRowCellFactory(CheckBox selectAllRowsInTable) {
+	public SelectThisRowCellFactory() {
 
-		this.selectAllRowsInTable = selectAllRowsInTable;
+		
 	}
 
 	@Override
@@ -36,6 +32,6 @@ public class SelectThisRowCellFactory<T extends TableViewDataModelBinding>
 		/**
 		 * Build the cell with the delegate to the selectAllRowsInTable.
 		 */
-		return new SelectThisRowCell<T, Boolean>(selectAllRowsInTable);	
+		return new SelectThisRowCell<T, Boolean>();	
 	}
 }

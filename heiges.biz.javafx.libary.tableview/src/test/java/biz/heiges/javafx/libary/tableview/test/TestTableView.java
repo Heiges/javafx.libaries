@@ -1,8 +1,5 @@
 package biz.heiges.javafx.libary.tableview.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import heiges.biz.javafx.libary.tableview.TableView;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -40,10 +37,8 @@ public class TestTableView extends Application {
 		table.prefHeightProperty().bind(primaryBox.heightProperty());
 		table.prefWidthProperty().bind(primaryBox.widthProperty());
 		
-		table.addComboBoxColumn("ComboBoxList", buildComboBoxList(), "ComboBoxListProperty");
-		table.addCheckBoxColumn("Spalte 1", "Field1BooleanProperty");
-		table.addStringColumn("Spalte 2", "Field2StringProperty");
-		table.addStringColumn("Spalte 3", "StringProperty");
+		table.addStringColumn("text", "text");
+		table.addCheckBoxColumn("checked", "checked");
 
 		primaryBox.getChildren().add(table.getRootNode());
 		root.getChildren().add(primaryBox);
@@ -58,35 +53,28 @@ public class TestTableView extends Application {
 	
 		for (TestTableViewBinding testTableViewBinding : data) {
 			System.out.println(
-					testTableViewBinding.getSelectedProperty()
-					+ " - " + testTableViewBinding.getComboBoxListProperty() 
-					+ " - " + testTableViewBinding.getField1BooleanProperty() 					
-					+ " - " + testTableViewBinding.getField1StringProperty() 
-					+ " - " + testTableViewBinding.getField2StringProperty()
-					+ " - " + testTableViewBinding.getStringProperty());
+					  "row is selected = " + testTableViewBinding.selectedProperty().getValue()
+					+ " || text = " + testTableViewBinding.getText() 
+					+ " || checked = " + testTableViewBinding.getChecked()); 					
 		}
 	}
 	
 	private ObservableList<TestTableViewBinding> buildItems() {
 		TestTableViewBinding binding = new TestTableViewBinding();
-		binding.setField1StringProperty("zeile 1 - eins");
-		binding.setField2StringProperty("zweile 1 - zwei");
-		binding.setStringProperty("zeile 1 - drei");
-		binding.setComboBoxListProperty("val1");
+		binding.setText("zeile 1 - eins");
+		binding.setChecked(Boolean.FALSE);
 		TestTableViewBinding binding2 = new TestTableViewBinding();
-		binding2.setField1StringProperty("zeile 2 - eins");
-		binding2.setField2StringProperty("zeile 2 - zwei");
-		binding2.setStringProperty("zeile 2 - drei");
-		binding2.setComboBoxListProperty("val1");
+		binding2.setText("zeile 1 - eins");
+		binding2.setChecked(Boolean.FALSE);		
 		data.addAll(binding, binding2);
 		return data;
 	}	
 	
-	private List<String> buildComboBoxList() {
-		List<String> l = new ArrayList<String>();
-		l.add("val1");
-		l.add("val2");
-		l.add("val3");
-		return l;
-	}
+//	private List<String> buildComboBoxList() {
+//		List<String> l = new ArrayList<String>();
+//		l.add("val1");
+//		l.add("val2");
+//		l.add("val3");
+//		return l;
+//	}
 }

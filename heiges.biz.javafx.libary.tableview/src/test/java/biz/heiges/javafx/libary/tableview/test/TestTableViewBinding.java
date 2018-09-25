@@ -5,56 +5,38 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class TestTableViewBinding extends TableViewDataModelBinding {
+	
+	/**
+	 * Property text
+	 */
+	private SimpleStringProperty text = new SimpleStringProperty("enter a value");
 
-	private SimpleStringProperty field1String = new SimpleStringProperty("enter a value");
-	
-	private SimpleStringProperty field2String = new SimpleStringProperty("enter a value");
-
-	private SimpleStringProperty stringProperty = new SimpleStringProperty("enter a value");
-	
-	private SimpleStringProperty comboBoxListProperty = new SimpleStringProperty("select a value");
-	
-	private SimpleBooleanProperty booleanField1 = new SimpleBooleanProperty(false);
-	
-	public void setField1BooleanProperty(Boolean value) {
-		this.booleanField1 = new SimpleBooleanProperty(value);
+	public void setText(String value) {
+		this.text.setValue(value);
 	}
 	
-	public SimpleBooleanProperty getField1BooleanProperty() {
-		return booleanField1;
+	public String getText() {
+		return text.getValue();
 	}
 	
-	
-	
-	public void setStringProperty(String value) {
-		this.stringProperty = new SimpleStringProperty(value);
-	}
-	
-	public SimpleStringProperty getStringProperty() {
-		return stringProperty;
+	public SimpleStringProperty textProperty() {
+		return text;
 	}
 
-	public void setField1StringProperty(String value) {
-		this.field1String = new SimpleStringProperty(value);
+	/**
+	 * Property checked
+	 */	
+	private SimpleBooleanProperty checked = new SimpleBooleanProperty(false);
+	
+	public void setChecked(Boolean value) {
+		this.checked.setValue(value);
 	}
 	
-	public SimpleStringProperty getField1StringProperty() {
-		return field1String;
+	public boolean getChecked() {
+		return this.checked.getValue();
 	}
 	
-	public void setField2StringProperty(String value) {
-		this.field2String = new SimpleStringProperty(value);
-	}
-	
-	public SimpleStringProperty getField2StringProperty() {
-		return field2String;
-	}
-
-	public SimpleStringProperty getComboBoxListProperty() {
-		return comboBoxListProperty;
-	}
-
-	public void setComboBoxListProperty(String comboBoxListProperty) {
-		this.comboBoxListProperty = new SimpleStringProperty(comboBoxListProperty);
+	public SimpleBooleanProperty checkedProperty() {
+		return checked;
 	}
 }
