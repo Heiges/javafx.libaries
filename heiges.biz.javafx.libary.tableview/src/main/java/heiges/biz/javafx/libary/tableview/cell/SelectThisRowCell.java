@@ -7,13 +7,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
@@ -83,32 +81,10 @@ public class SelectThisRowCell<S extends TableViewDataModelBinding, T> extends T
 				} else {
 					selectThisRowCheckBox.setVisible(Boolean.valueOf(newValue));
 				}
-
-				// FIXME total falsch hier
-				//updateAllRowsAreSelectedCheckBox(selectAllRows);
 			}
 		});
 	}
 
-//	/**
-//	 * Update the allRowsAreSelected check box. Set the allRowsAreSelected to true
-//	 * if all rows are selected now or to false if a single row is not selected.
-//	 * 
-//	 * @param selectAllRows
-//	 */
-//	private void updateAllRowsAreSelectedCheckBox(CheckBox selectAllRows) {
-//
-//		ObservableList<S> items = getTableView().getItems();
-//		// FIXME use lambda for this
-//		boolean allRowsAreSelected = true;
-//		for (S item : items) {
-//			if (item.selectedProperty().getValue() == false) {
-//				allRowsAreSelected = false;
-//				break;
-//			}
-//		}
-//		selectAllRows.selectedProperty().set(allRowsAreSelected);
-//	}
 
 	/**
 	 * Set the visibility of all buttons when the mouse enters the cell.
