@@ -29,6 +29,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
+/**
+ * A tableview with additionl functionality.
+ * 
+ * @author Hansjoachim Heiges
+ *
+ * @param <T> the data model for the items of the tableview.
+ */
 public class TableView<T extends TableViewDataModelBinding> {
 
 	// A listener for changing an single item of the table
@@ -46,13 +53,15 @@ public class TableView<T extends TableViewDataModelBinding> {
 	private TableColumn<T, Boolean> actionCol = null;
 
 	@SuppressWarnings("rawtypes")
-	private List columns = new ArrayList<TableColumn>();
+	private List columns = new ArrayList<>();
 
 	private VBox vbox = null;
 
 	ObservableList<T> items;
 
 	private CheckBox selectAllRowsCheckBox = null;
+	
+	private Boolean currentEditableState = false;
 
 	/**
 	 * The main column, all other columns will be added as child columns and will be
@@ -163,17 +172,27 @@ public class TableView<T extends TableViewDataModelBinding> {
 		observableItems.addAll(items);
 	}
 
+	
 	private Button buildEditButton() {
 		// F023 Closed Lock
 		// F009 Open Lock
-		Label editLabel = new Label("\uF023");
-		editLabel.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
-		Button editButton = new Button("", editLabel);
+		Label editLabelClosedLock = new Label("\uF023");
+		Label editLabelOpenLock = new Label("\uF09c");
+		editLabelClosedLock.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
+		editLabelOpenLock.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
+		Button editButton = new Button("", editLabelClosedLock);
 		editButton.setId("editButton");
 		editButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-
+				currentEditableState = !currentEditableState;
+				if (currentEditableState == false) {
+					editButton.setGraphic(editLabelClosedLock);
+				}
+				else {
+					editButton.setGraphic(editLabelOpenLock);
+				}
+				setEditableState();
 			}
 		});
 		return editButton;
@@ -242,7 +261,6 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 				items.stream().forEach(binding -> binding.selectedProperty().set(selectAllRows.isSelected()));
 
-
 				addListChangeListerToObservableItems();
 			}
 		});
@@ -296,7 +314,6 @@ public class TableView<T extends TableViewDataModelBinding> {
 		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(stringColumn);
 		sortColumns();
-//		stringColumn.setEditable(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -306,7 +323,6 @@ public class TableView<T extends TableViewDataModelBinding> {
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(comboBoxColumn);
 		sortColumns();
-//		comboBoxColumn.setEditable(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -316,15 +332,24 @@ public class TableView<T extends TableViewDataModelBinding> {
 		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
 		columns.add(comboBoxColumn);
 		sortColumns();
-//		comboBoxColumn.setEditable(false);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	private void sortColumns() {
+		setEditableState();
 		headerCol.getColumns().clear();
 		headerCol.getColumns().add(selectARowColumn);
 		headerCol.getColumns().addAll(columns);
 		headerCol.getColumns().add(actionCol);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void setEditableState() {
+		//FIXME parameterize raw type
+		for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
+			TableColumn column = (TableColumn) iterator.next();
+			column.setEditable(currentEditableState);
+		}
 	}
 
 	public Property<Number> prefHeightProperty() {
@@ -340,6 +365,8 @@ public class TableView<T extends TableViewDataModelBinding> {
 	}
 
 	/**
+	 * A ListChangeListener with a callback for notification if items itself
+	 * changed. Used for notifying if the selected property has been clicked.
 	 * 
 	 * @author Hansjoachim Heiges
 	 *
@@ -367,7 +394,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 						}
 						selectAllRowsCheckBox.selectedProperty().set(allRowsAreSelected);
 					}
-				} 
+				}
 			}
 		}
 	}
