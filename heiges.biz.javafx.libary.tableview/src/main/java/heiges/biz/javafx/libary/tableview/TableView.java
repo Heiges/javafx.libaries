@@ -172,7 +172,6 @@ public class TableView<T extends TableViewDataModelBinding> {
 		observableItems.addAll(items);
 	}
 
-	
 	private Button buildEditButton() {
 		// F023 Closed Lock
 		// F009 Open Lock
