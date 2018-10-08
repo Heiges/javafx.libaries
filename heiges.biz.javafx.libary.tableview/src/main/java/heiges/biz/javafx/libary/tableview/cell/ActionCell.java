@@ -2,6 +2,7 @@ package heiges.biz.javafx.libary.tableview.cell;
 
 import heiges.biz.javafx.libary.commons.Fonts;
 import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -57,6 +58,15 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 		Label editLabel = new Label("\uF044");
 		editLabel.setFont(font);
 		editThisRowButton = new Button("", editLabel);
+		
+		editThisRowButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				System.out.println("edit view");
+			}
+		});
+		
+		
 		editThisRowButton.setAlignment(Pos.CENTER_LEFT);
 		editThisRowButton.setStyle("-fx-background-color: transparent;");
 		editThisRowButton.setPadding(Insets.EMPTY);
@@ -69,6 +79,16 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 		Label detailViewLabel = new Label("\uF002");
 		detailViewLabel.setFont(font);
 		detailViewButton = new Button("", detailViewLabel);
+		
+		
+		detailViewButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				System.out.println("detail view");
+			}
+		});
+		
+		
 		detailViewButton.setAlignment(Pos.CENTER_LEFT);
 		detailViewButton.setStyle("-fx-background-color: transparent;");
 		detailViewButton.setPadding(new Insets(0,5,0,5));

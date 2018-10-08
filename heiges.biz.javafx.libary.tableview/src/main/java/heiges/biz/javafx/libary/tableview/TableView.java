@@ -26,11 +26,12 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 /**
- * A tableview with additionl functionality.
+ * A tableview with additional functionality.
  * 
  * @author Hansjoachim Heiges
  *
@@ -42,8 +43,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	private TableView<T>.ListChangeListenerImplementation listChangeListener = null;
 
 	// An observable list with notifications when a single item in the list has been
-	// changed.
-	// Will be used together with the listChangeListener.
+	// changed. Will be used together with the listChangeListener.
 	private ObservableList<T> observableItems = null;
 
 	private javafx.scene.control.TableView<T> table = null;
@@ -55,12 +55,15 @@ public class TableView<T extends TableViewDataModelBinding> {
 	@SuppressWarnings("rawtypes")
 	private List columns = new ArrayList<>();
 
-	private VBox vbox = null;
+//	private VBox vbox = null;
 
+	
+	StackPane root = null;
+	
 	ObservableList<T> items;
 
 	private CheckBox selectAllRowsCheckBox = null;
-	
+
 	private Boolean currentEditableState = false;
 
 	/**
@@ -80,19 +83,73 @@ public class TableView<T extends TableViewDataModelBinding> {
 	public TableView(ObservableList<T> items, ItemFactory factory) {
 
 		this.items = items;
+		
+		//TODO Build the detail view and the wrapping vertical box for the detail view.
+		VBox vboxForDetailsView = new VBox();
+		Button button = new Button("foobar");
+		
+		button.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				changeView(0);
+			}
+		});
+		
+		
+		
+		vboxForDetailsView.getChildren().add(button);
+		button.prefHeightProperty().bind(vboxForDetailsView.heightProperty());
+		button.prefWidthProperty().bind(vboxForDetailsView.widthProperty());
+		
+		VBox vboxForTable = buildTableView(items, factory);
+		
+		// Build the stack pane containing the table and the details view.
+		// Bind the height and width properties of the stack pane and the vertical boxes of the table and details views
+		root = new StackPane();
+		vboxForTable.prefHeightProperty().bind(root.heightProperty());
+		vboxForTable.prefWidthProperty().bind(root.widthProperty());
+		vboxForDetailsView.prefHeightProperty().bind(root.heightProperty());
+		vboxForDetailsView.prefWidthProperty().bind(root.widthProperty());
+		
+		// Add the table and the detail view to the stack pane.
+		root.getChildren().addAll(vboxForDetailsView, vboxForTable);
+	}
 
+	
+	private void changeView(Integer viewIndex) {
+
+		ObservableList<Node> childs = root.getChildren();
+
+		Node topNode = null;
+		Node newTopNode = null;
+		
+		if (viewIndex == 0) {
+			
+			topNode = childs.get(1);
+			newTopNode = childs.get(0);
+		}
+		else if (viewIndex == 1) {
+
+			topNode = childs.get(0);
+			newTopNode = childs.get(1);
+		}
+   
+		topNode.setVisible(false);
+		topNode.toBack();          
+		newTopNode.setVisible(true);
+	}
+	
+	
+	private VBox buildTableView(ObservableList<T> items, ItemFactory factory) {
+		
 		// Build the table and the wrapping vertical box for the table.
-		vbox = new VBox();
+		VBox vboxForTable = new VBox();
 		table = new javafx.scene.control.TableView<T>(items);
-		table.setId("tableview");
-		vbox.getChildren().add(table);
-
-		// Bind the height and width properties of vbox and table and set the resize
-		// policy.
-		table.prefHeightProperty().bind(vbox.heightProperty());
-		table.prefWidthProperty().bind(vbox.widthProperty());
+		vboxForTable.getChildren().add(table);
+		table.prefHeightProperty().bind(vboxForTable.heightProperty());
+		table.prefWidthProperty().bind(vboxForTable.widthProperty());
 		table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);
-
+		
 		// Build the header column and add it to the table.
 		headerCol = new TableColumn<T, String>("");
 		table.getColumns().add(headerCol);
@@ -108,7 +165,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		selectARowColumn.setCellFactory(cellFactory -> new SelectThisRowCell<>());
 
 		// NEU
-		// FIXME what is the correkt Type for a row with buttons only?
+		// FIXME what is the correct Type for a row with buttons only?
 		actionCol = new TableColumn<T, Boolean>("");
 		actionCol.setId("actionCol");
 		// FIXME get a property to bind for our actions in the meantime just use
@@ -126,7 +183,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		selectARowColumnHeaderBox.getChildren().addAll(selectAllRowsCheckBox);
 		selectARowColumn.setGraphic(selectARowColumnHeaderBox);
 
-		// Build all needed action buttons and add it to headercolumn of the table. The
+		// Build all needed action buttons and add it to header column of the table. The
 		// selectAllRowsCheckBox will be connected with the new action button for
 		// changing the state if a new item is added to the table.
 		Button buttonNew = buildNewButton(factory, selectAllRowsCheckBox);
@@ -140,13 +197,16 @@ public class TableView<T extends TableViewDataModelBinding> {
 		actionBox.getChildren().addAll(buttonNew, buttonDelete, editButton);
 		headerCol.setGraphic(actionBox);
 
-		// set table to editable false
+		// set table to editable true, else the selectThisRowCheckBox will not be usable.
 		table.setEditable(true);
 
 		updateObservableItems(items);
+		
 		buildListChangeListener(items);
+		
 		addListChangeListerToObservableItems();
-
+		
+		return vboxForTable;
 	}
 
 	private void addListChangeListerToObservableItems() {
@@ -187,8 +247,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 				currentEditableState = !currentEditableState;
 				if (currentEditableState == false) {
 					editButton.setGraphic(editLabelClosedLock);
-				}
-				else {
+				} else {
 					editButton.setGraphic(editLabelOpenLock);
 				}
 				setEditableState();
@@ -344,7 +403,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 	@SuppressWarnings("rawtypes")
 	private void setEditableState() {
-		//FIXME parameterize raw type
+		// FIXME parameterize raw type
 		for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
 			TableColumn column = (TableColumn) iterator.next();
 			column.setEditable(currentEditableState);
@@ -352,15 +411,15 @@ public class TableView<T extends TableViewDataModelBinding> {
 	}
 
 	public Property<Number> prefHeightProperty() {
-		return vbox.prefHeightProperty();
+		return root.prefHeightProperty();
 	}
 
 	public Property<Number> prefWidthProperty() {
-		return vbox.prefWidthProperty();
+		return root.prefWidthProperty();
 	}
 
 	public Node getRootNode() {
-		return vbox;
+		return root;
 	}
 
 	/**
