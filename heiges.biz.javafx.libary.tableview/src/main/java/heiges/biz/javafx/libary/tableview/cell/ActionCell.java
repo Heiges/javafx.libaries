@@ -12,6 +12,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
+import javafx.util.Callback;
 
 /**
  * 
@@ -29,8 +30,16 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 	private Button detailViewButton = null;
 	
 	private Font font = null;
-
-	public ActionCell() {
+	
+	// FIXME Better parameters for the callback
+	private Callback<String, String> callBackForEditView = null;
+	// FIXME Better parameters for the callback	
+	private Callback<String, String> callBackForDetailView = null;
+	
+	/**
+	 * standard c-tor.
+	 */
+	public ActionCell(Callback<String, String> edit, Callback<String, String> detail) {
 		
 		font = Fonts.getFont("/fa/fontawesome-webfont.ttf", 15);
 
@@ -49,8 +58,22 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 		buildBehaviorForSetOnMouseEntered(actionBox);
 
 		buildBehaviorForSetOnMouseExited(actionBox);
+		
+		setBehaviorForDetailView(detail);
+		
+		setBehaviorForEditView(edit);
 	}
 
+	
+	public void setBehaviorForDetailView(Callback<String, String> value) {
+		this.callBackForDetailView = value;
+	}
+	
+	public void setBehaviorForEditView(Callback<String, String> value) {
+		this.callBackForEditView = value;
+	}
+	
+	
 	/**
 	 * Build the editThisRow button
 	 */
@@ -63,9 +86,9 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 			@Override
 			public void handle(ActionEvent e) {
 				System.out.println("edit view");
+				callBackForEditView.call(null);
 			}
 		});
-		
 		
 		editThisRowButton.setAlignment(Pos.CENTER_LEFT);
 		editThisRowButton.setStyle("-fx-background-color: transparent;");
@@ -85,9 +108,9 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 			@Override
 			public void handle(ActionEvent e) {
 				System.out.println("detail view");
+				callBackForDetailView.call(null);
 			}
 		});
-		
 		
 		detailViewButton.setAlignment(Pos.CENTER_LEFT);
 		detailViewButton.setStyle("-fx-background-color: transparent;");

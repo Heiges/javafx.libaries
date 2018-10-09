@@ -54,9 +54,6 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 	@SuppressWarnings("rawtypes")
 	private List columns = new ArrayList<>();
-
-//	private VBox vbox = null;
-
 	
 	StackPane root = null;
 	
@@ -76,6 +73,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	private TableColumn<T, String> headerCol = null;
 
 	/**
+	 * c-tor.
 	 * 
 	 * @param items
 	 * @param factory
@@ -84,22 +82,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 		this.items = items;
 		
-		//TODO Build the detail view and the wrapping vertical box for the detail view.
-		VBox vboxForDetailsView = new VBox();
-		Button button = new Button("foobar");
-		
-		button.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				changeView(0);
-			}
-		});
-		
-		
-		
-		vboxForDetailsView.getChildren().add(button);
-		button.prefHeightProperty().bind(vboxForDetailsView.heightProperty());
-		button.prefWidthProperty().bind(vboxForDetailsView.widthProperty());
+		VBox vboxForDetailsView = buildDetailView();
 		
 		VBox vboxForTable = buildTableView(items, factory);
 		
@@ -115,24 +98,58 @@ public class TableView<T extends TableViewDataModelBinding> {
 		root.getChildren().addAll(vboxForDetailsView, vboxForTable);
 	}
 
+
+
+	private VBox buildDetailView() {
+		// Build the detail view and the wrapping vertical box for the detail view.
+		VBox vboxForDetailsView = new VBox();
+		Button button = new Button("foobar");	
+		button.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				changeView(1);
+			}
+		});
+		vboxForDetailsView.getChildren().add(button);
+		button.prefHeightProperty().bind(vboxForDetailsView.heightProperty());
+		button.prefWidthProperty().bind(vboxForDetailsView.widthProperty());
+		return vboxForDetailsView;
+	}
+
+	
+	
+	private Callback<String, String> buildCallbackForEditView() {
+
+		return new Callback<String, String>() {
+			@Override
+			public String call(String param) {
+				System.out.println("edit view : Input parameter is " + param);
+				changeView(0); // 0 == Details 1 == table
+				return null;
+			}
+		};
+	}
+	
+	private Callback<String, String> buildCallbackForDetailView() {
+		
+		return new Callback<String, String>() {
+			@Override
+			public String call(String param) {
+				System.out.println("detail  view : Input parameter is " + param);
+				
+				changeView(0); // 0 == Details 1 == table
+				return null;
+			}
+		};
+	}
+	
 	
 	private void changeView(Integer viewIndex) {
 
 		ObservableList<Node> childs = root.getChildren();
-
-		Node topNode = null;
-		Node newTopNode = null;
-		
-		if (viewIndex == 0) {
 			
-			topNode = childs.get(1);
-			newTopNode = childs.get(0);
-		}
-		else if (viewIndex == 1) {
-
-			topNode = childs.get(0);
-			newTopNode = childs.get(1);
-		}
+		Node topNode = childs.get(1);
+		Node newTopNode = childs.get(0);
    
 		topNode.setVisible(false);
 		topNode.toBack();          
@@ -171,7 +188,9 @@ public class TableView<T extends TableViewDataModelBinding> {
 		// FIXME get a property to bind for our actions in the meantime just use
 		// selectedProperty
 		actionCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("selected"));
-		actionCol.setCellFactory(cellFactory -> new ActionCell<>());
+//		actionCol.setCellFactory(cellFactory -> new ActionCell<>());
+		// FIXME instead of setting the callbacks via constructor, use a prebuild instance, but handle the casting problem then.
+		actionCol.setCellFactory(cellFactory -> new ActionCell<T, Boolean>(buildCallbackForEditView(), buildCallbackForDetailView()));
 		actionCol.setSortable(false);
 
 		// Add selectAllRows check box to the selectARowColumn column header. The
