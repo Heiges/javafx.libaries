@@ -18,10 +18,12 @@ import javafx.util.Callback;
  * 
  * @author Hansjoachim Heiges
  *
- * @param <S>
- * @param <T>
+ * @param <DATA_BINDING> The type of the TableView generic type (i.e. S == TableView&lt;S&gt;).
+ *           This should also match with the first generic type in TableColumn.
+ * @param <TYPE_OF_CELL_ITEM> The type of the item contained within the Cell.
+ *
  */
-public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCell<S, T> {
+public class ActionCell<DATA_BINDING extends TableViewDataModelBinding, TYPE_OF_CELL_ITEM> extends TableCell<DATA_BINDING, TYPE_OF_CELL_ITEM> {
 
 	private HBox actionBox = new HBox();
 	
@@ -32,14 +34,14 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 	private Font font = null;
 	
 	// FIXME Better parameters for the callback
-	private Callback<String, String> callBackForEditView = null;
+	private Callback<DATA_BINDING, String> callBackForEditView = null;
 	// FIXME Better parameters for the callback	
-	private Callback<String, String> callBackForDetailView = null;
+	private Callback<DATA_BINDING, String> callBackForDetailView = null;
 	
 	/**
 	 * standard c-tor.
 	 */
-	public ActionCell(Callback<String, String> edit, Callback<String, String> detail) {
+	public ActionCell(Callback<DATA_BINDING, String> edit, Callback<DATA_BINDING, String> detail) {
 		
 		font = Fonts.getFont("/fa/fontawesome-webfont.ttf", 15);
 
@@ -65,11 +67,11 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 	}
 
 	
-	public void setBehaviorForDetailView(Callback<String, String> value) {
+	public void setBehaviorForDetailView(Callback<DATA_BINDING, String> value) {
 		this.callBackForDetailView = value;
 	}
 	
-	public void setBehaviorForEditView(Callback<String, String> value) {
+	public void setBehaviorForEditView(Callback<DATA_BINDING, String> value) {
 		this.callBackForEditView = value;
 	}
 	
@@ -86,7 +88,7 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 			@Override
 			public void handle(ActionEvent e) {
 				System.out.println("edit view");
-				callBackForEditView.call(null);
+				callBackForEditView.call(getTableRow().getItem());
 			}
 		});
 		
@@ -108,7 +110,7 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 			@Override
 			public void handle(ActionEvent e) {
 				System.out.println("detail view");
-				callBackForDetailView.call(null);
+				callBackForDetailView.call(getTableRow().getItem());
 			}
 		});
 		
@@ -149,7 +151,7 @@ public class ActionCell<S extends TableViewDataModelBinding, T> extends TableCel
 	}
 
 	@Override
-	protected void updateItem(T item, boolean empty) {
+	protected void updateItem(TYPE_OF_CELL_ITEM item, boolean empty) {
 
 		super.updateItem(item, empty);
 

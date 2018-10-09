@@ -21,6 +21,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -35,29 +36,29 @@ import javafx.util.Callback;
  * 
  * @author Hansjoachim Heiges
  *
- * @param <T> the data model for the items of the tableview.
+ * @param <DATA_BINDING> the data model for the items of the table view.
  */
-public class TableView<T extends TableViewDataModelBinding> {
+public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
 	// A listener for changing an single item of the table
-	private TableView<T>.ListChangeListenerImplementation listChangeListener = null;
+	private TableView<DATA_BINDING>.ListChangeListenerImplementation listChangeListener = null;
 
 	// An observable list with notifications when a single item in the list has been
 	// changed. Will be used together with the listChangeListener.
-	private ObservableList<T> observableItems = null;
+	private ObservableList<DATA_BINDING> observableItems = null;
 
-	private javafx.scene.control.TableView<T> table = null;
+	private javafx.scene.control.TableView<DATA_BINDING> table = null;
 
-	private TableColumn<T, Boolean> selectARowColumn = null;
+	private TableColumn<DATA_BINDING, Boolean> selectARowColumn = null;
 
-	private TableColumn<T, Boolean> actionCol = null;
+	private TableColumn<DATA_BINDING, Boolean> actionCol = null;
 
 	@SuppressWarnings("rawtypes")
 	private List columns = new ArrayList<>();
 	
 	StackPane root = null;
 	
-	ObservableList<T> items;
+	ObservableList<DATA_BINDING> items;
 
 	private CheckBox selectAllRowsCheckBox = null;
 
@@ -70,7 +71,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 * the delete button will only affect selected rows while the new button will
 	 * add a new item to the table
 	 */
-	private TableColumn<T, String> headerCol = null;
+	private TableColumn<DATA_BINDING, String> headerCol = null;
 
 	/**
 	 * c-tor.
@@ -78,7 +79,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 * @param items
 	 * @param factory
 	 */
-	public TableView(ObservableList<T> items, ItemFactory factory) {
+	public TableView(ObservableList<DATA_BINDING> items, ItemFactory factory) {
 
 		this.items = items;
 		
@@ -101,28 +102,41 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 
 	private VBox buildDetailView() {
-		// Build the detail view and the wrapping vertical box for the detail view.
+		
+		// Build the vertical wrapping box for the detail view. 
 		VBox vboxForDetailsView = new VBox();
-		Button button = new Button("foobar");	
-		button.setOnAction(new EventHandler<ActionEvent>() {
+		// TODO build a nice border similar to the border of the table view.
+		
+		// Build the horizontal box for all needed buttons for the detail view.
+		// Set the alignment and bind the width to the wrapping vertical box.
+		HBox hboxForTopButtons = new HBox();	
+		hboxForTopButtons.setAlignment(Pos.TOP_RIGHT);
+		hboxForTopButtons.prefWidthProperty().bind(vboxForDetailsView.widthProperty());
+		
+		// Build the close button and the behavior and add it to the horizontal box.
+		Label closeLabelCross = new Label("\uF00D");
+		closeLabelCross.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
+		Button closeButton = new Button("", closeLabelCross);
+		closeButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
 				changeView(1);
 			}
 		});
-		vboxForDetailsView.getChildren().add(button);
-		button.prefHeightProperty().bind(vboxForDetailsView.heightProperty());
-		button.prefWidthProperty().bind(vboxForDetailsView.widthProperty());
+		hboxForTopButtons.getChildren().add(closeButton);
+		
+		// add the horizontal box to the vertical box.
+		vboxForDetailsView.getChildren().add(hboxForTopButtons);
 		return vboxForDetailsView;
 	}
 
 	
 	
-	private Callback<String, String> buildCallbackForEditView() {
+	private Callback<DATA_BINDING, String> buildCallbackForEditView() {
 
-		return new Callback<String, String>() {
+		return new Callback<DATA_BINDING, String>() {
 			@Override
-			public String call(String param) {
+			public String call(DATA_BINDING param) {
 				System.out.println("edit view : Input parameter is " + param);
 				changeView(0); // 0 == Details 1 == table
 				return null;
@@ -130,11 +144,11 @@ public class TableView<T extends TableViewDataModelBinding> {
 		};
 	}
 	
-	private Callback<String, String> buildCallbackForDetailView() {
+	private Callback<DATA_BINDING, String> buildCallbackForDetailView() {
 		
-		return new Callback<String, String>() {
+		return new Callback<DATA_BINDING, String>() {
 			@Override
-			public String call(String param) {
+			public String call(DATA_BINDING param) {
 				System.out.println("detail  view : Input parameter is " + param);
 				
 				changeView(0); // 0 == Details 1 == table
@@ -157,18 +171,18 @@ public class TableView<T extends TableViewDataModelBinding> {
 	}
 	
 	
-	private VBox buildTableView(ObservableList<T> items, ItemFactory factory) {
+	private VBox buildTableView(ObservableList<DATA_BINDING> items, ItemFactory factory) {
 		
 		// Build the table and the wrapping vertical box for the table.
 		VBox vboxForTable = new VBox();
-		table = new javafx.scene.control.TableView<T>(items);
+		table = new javafx.scene.control.TableView<DATA_BINDING>(items);
 		vboxForTable.getChildren().add(table);
 		table.prefHeightProperty().bind(vboxForTable.heightProperty());
 		table.prefWidthProperty().bind(vboxForTable.widthProperty());
 		table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);
 		
 		// Build the header column and add it to the table.
-		headerCol = new TableColumn<T, String>("");
+		headerCol = new TableColumn<DATA_BINDING, String>("");
 		table.getColumns().add(headerCol);
 
 		// Build the selection box and the SelectionBoxCellFactory. The
@@ -183,16 +197,22 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 		// NEU
 		// FIXME what is the correct Type for a row with buttons only?
-		actionCol = new TableColumn<T, Boolean>("");
+		actionCol = new TableColumn<DATA_BINDING, Boolean>("");
 		actionCol.setId("actionCol");
 		// FIXME get a property to bind for our actions in the meantime just use
 		// selectedProperty
-		actionCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("selected"));
-//		actionCol.setCellFactory(cellFactory -> new ActionCell<>());
+		actionCol.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, Boolean>("selected"));
+//		actionCol.setCellFactory(cellFactory -> new ActionCell<>(null, null));  // compiles
+//		actionCol.setCellFactory(cellFactory -> new ActionCell<T, Boolean>(null, null));  // compiles too
+//		
+//		ActionCell<T, Boolean> actionCell = new ActionCell<T, Boolean>(null, null);
+//		actionCol.cellFactoryProperty().set(actionCell);  // compiles not casting error
+//		actionCol.setCellFactory(actionCell);  // compiles not casting error
+//		
 		// FIXME instead of setting the callbacks via constructor, use a prebuild instance, but handle the casting problem then.
-		actionCol.setCellFactory(cellFactory -> new ActionCell<T, Boolean>(buildCallbackForEditView(), buildCallbackForDetailView()));
+		actionCol.setCellFactory(cellFactory -> new ActionCell<DATA_BINDING, Boolean>(buildCallbackForEditView(), buildCallbackForDetailView()));
 		actionCol.setSortable(false);
-
+	
 		// Add selectAllRows check box to the selectARowColumn column header. The
 		// checkBox will be connected with the checkBox cellFactory for displaying the
 		// state of the check box.
@@ -232,7 +252,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 		observableItems.addListener(listChangeListener);
 	}
 
-	private void buildListChangeListener(ObservableList<T> items) {
+	private void buildListChangeListener(ObservableList<DATA_BINDING> items) {
 		listChangeListener = new ListChangeListenerImplementation(items);
 	}
 
@@ -241,10 +261,10 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 * 
 	 * @param items the current list of items in the table view.
 	 */
-	private void updateObservableItems(ObservableList<T> items) {
-		observableItems = FXCollections.observableArrayList(new Callback<T, Observable[]>() {
+	private void updateObservableItems(ObservableList<DATA_BINDING> items) {
+		observableItems = FXCollections.observableArrayList(new Callback<DATA_BINDING, Observable[]>() {
 			@Override
-			public Observable[] call(T param) {
+			public Observable[] call(DATA_BINDING param) {
 				return new Observable[] { param.selectedProperty(), };
 			}
 		});
@@ -295,10 +315,10 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 				removeListChangeListenerFromObservableItems();
 
-				ObservableList<T> items = table.getItems();
-				Iterator<T> itemsIterator = items.iterator();
+				ObservableList<DATA_BINDING> items = table.getItems();
+				Iterator<DATA_BINDING> itemsIterator = items.iterator();
 				while (itemsIterator.hasNext()) {
-					T binding = (T) itemsIterator.next();
+					DATA_BINDING binding = (DATA_BINDING) itemsIterator.next();
 					if (binding.selectedProperty().getValue() == Boolean.TRUE) {
 						itemsIterator.remove();
 					}
@@ -363,7 +383,7 @@ public class TableView<T extends TableViewDataModelBinding> {
 
 				observableItems.removeListener(listChangeListener);
 
-				table.getItems().add((T) factory.build());
+				table.getItems().add((DATA_BINDING) factory.build());
 
 				// after adding an item the check box selectAll must be
 				// unchecked
@@ -377,36 +397,36 @@ public class TableView<T extends TableViewDataModelBinding> {
 		return buttonNew;
 	}
 
-	private TableColumn<T, Boolean> buildSelectedColumn() {
-		TableColumn<T, Boolean> selectedCol = new TableColumn<T, Boolean>("");
-		selectedCol.setCellValueFactory(new PropertyValueFactory<T, Boolean>("selected"));
+	private TableColumn<DATA_BINDING, Boolean> buildSelectedColumn() {
+		TableColumn<DATA_BINDING, Boolean> selectedCol = new TableColumn<DATA_BINDING, Boolean>("");
+		selectedCol.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, Boolean>("selected"));
 		selectedCol.setSortable(false);
 		return selectedCol;
 	}
 
 	@SuppressWarnings("unchecked")
 	public void addStringColumn(String name, String property) {
-		TableColumn<T, String> stringColumn = new TableColumn<T, String>(name);
+		TableColumn<DATA_BINDING, String> stringColumn = new TableColumn<DATA_BINDING, String>(name);
 		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		stringColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
+		stringColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
 		columns.add(stringColumn);
 		sortColumns();
 	}
 
 	@SuppressWarnings("unchecked")
 	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
-		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
+		TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
 		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
-		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
+		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
 		columns.add(comboBoxColumn);
 		sortColumns();
 	}
 
 	@SuppressWarnings("unchecked")
 	public void addCheckBoxColumn(String name, String property) {
-		TableColumn<T, String> comboBoxColumn = new TableColumn<T, String>(name);
+		TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
 		comboBoxColumn.setCellFactory(column -> new CheckBoxTableCell<>());
-		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<T, String>(property));
+		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
 		columns.add(comboBoxColumn);
 		sortColumns();
 	}
@@ -448,22 +468,22 @@ public class TableView<T extends TableViewDataModelBinding> {
 	 * @author Hansjoachim Heiges
 	 *
 	 */
-	private final class ListChangeListenerImplementation implements ListChangeListener<T> {
+	private final class ListChangeListenerImplementation implements ListChangeListener<DATA_BINDING> {
 
-		private final ObservableList<T> items;
+		private final ObservableList<DATA_BINDING> items;
 
-		private ListChangeListenerImplementation(ObservableList<T> items) {
+		private ListChangeListenerImplementation(ObservableList<DATA_BINDING> items) {
 			this.items = items;
 		}
 
 		@Override
-		public void onChanged(Change<? extends T> c) {
+		public void onChanged(Change<? extends DATA_BINDING> c) {
 			while (c.next()) {
 				if (c.wasUpdated()) {
 					for (int i = c.getFrom(); i < c.getTo(); ++i) {
 
 						boolean allRowsAreSelected = true;
-						for (T item : items) {
+						for (DATA_BINDING item : items) {
 							if (item.selectedProperty().getValue() == false) {
 								allRowsAreSelected = false;
 								break;
