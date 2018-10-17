@@ -455,7 +455,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		}
 		sortColumns();
 	}
-
+	
 	private void sortColumns() {
 		setEditableState();
 		headerCol.getColumns().clear();
