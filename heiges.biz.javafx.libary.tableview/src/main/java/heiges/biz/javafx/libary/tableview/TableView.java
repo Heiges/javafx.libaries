@@ -21,7 +21,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -43,7 +42,6 @@ import javafx.util.Callback;
 public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
 	private Text field1 = new Text("Inhalt 1");
-	
 	
 	// A listener for changing an single item of the table
 	private TableView<DATA_BINDING>.ListChangeListenerImplementation listChangeListener = null;
@@ -422,13 +420,15 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		return selectedCol;
 	}
 
-	
 	public enum ColumnType {
-
 		FIELD, DATE, LIST, CHECKBOX;
 	}
 
-	public void addColumn(String name, String property, ColumnType type, List<String> comboBoxList) {
+	public enum ViewType {
+		DETAIL, TABLE, BOTH;
+	}
+	
+	public void addColumn(String name, String property, ColumnType type, ViewType viewType, List<String> comboBoxList) {
 		
 		switch (type) {
 		case FIELD:
