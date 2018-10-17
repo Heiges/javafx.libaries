@@ -453,8 +453,6 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		default:
 			break;
 		}
-		
-
 		sortColumns();
 	}
 
