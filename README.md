@@ -1,2 +1,2 @@
 # javafx.libaries
-Libaries and components for javafx
+Libaries and components for javafx.
