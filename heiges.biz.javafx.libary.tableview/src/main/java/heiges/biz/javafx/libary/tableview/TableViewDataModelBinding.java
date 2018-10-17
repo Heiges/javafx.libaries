@@ -1,5 +1,8 @@
 package heiges.biz.javafx.libary.tableview;
 
+import java.util.ArrayList;
+
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 
 /**
@@ -11,6 +14,8 @@ public abstract class TableViewDataModelBinding {
 
 	private SimpleBooleanProperty selectedProperty;
 
+	private ArrayList registeresDetailViewColumns = new ArrayList();
+	
 	public TableViewDataModelBinding() {
 		this.selectedProperty = new SimpleBooleanProperty(false);
 	}
@@ -18,4 +23,17 @@ public abstract class TableViewDataModelBinding {
 	public SimpleBooleanProperty selectedProperty() {
 		return selectedProperty;
 	}
+	
+	public void registerForFiltering() {
+		 
+	}
+	
+	public void registerForTableView() {
+		 
+	}
+	
+	public void registerForDetailView() {
+		 
+	}
+	
 }

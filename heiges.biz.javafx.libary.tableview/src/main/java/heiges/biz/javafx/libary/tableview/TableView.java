@@ -26,9 +26,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 
 /**
@@ -40,6 +42,9 @@ import javafx.util.Callback;
  */
 public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
+	private Text field1 = new Text("Inhalt 1");
+	
+	
 	// A listener for changing an single item of the table
 	private TableView<DATA_BINDING>.ListChangeListenerImplementation listChangeListener = null;
 
@@ -53,8 +58,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
 	private TableColumn<DATA_BINDING, Boolean> actionCol = null;
 
-	@SuppressWarnings("rawtypes")
-	private List columns = new ArrayList<>();
+	private List<TableColumn<DATA_BINDING, ?>> columns = new ArrayList<>();
 	
 	StackPane root = null;
 	
@@ -125,12 +129,24 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		});
 		hboxForTopButtons.getChildren().add(closeButton);
 		
+		// Build some demo stuff for the detail view for experiemental purposes
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(5);
+
+	    grid.add(new Text("Field 1"), 0, 0); 	grid.add(field1, 1, 0);
+	    grid.add(new Text("Field 2"), 0, 1); 	grid.add(new Text("Inhalt 2"), 1, 1);
+	    grid.add(new Text("Field 2"), 0, 2); 	grid.add(new Text("Inhalt 3"), 1, 2);
+	    
 		// add the horizontal box to the vertical box.
-		vboxForDetailsView.getChildren().add(hboxForTopButtons);
+		vboxForDetailsView.getChildren().addAll(hboxForTopButtons, grid);
 		return vboxForDetailsView;
 	}
 
-	
+	private void updateDetailView(DATA_BINDING value) {
+		
+		field1.setText("changed");
+	}
 	
 	private Callback<DATA_BINDING, String> buildCallbackForEditView() {
 
@@ -139,6 +155,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			public String call(DATA_BINDING param) {
 				System.out.println("edit view : Input parameter is " + param);
 				changeView(0); // 0 == Details 1 == table
+				updateDetailView(param);
 				return null;
 			}
 		};
@@ -152,6 +169,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 				System.out.println("detail  view : Input parameter is " + param);
 				
 				changeView(0); // 0 == Details 1 == table
+				updateDetailView(param);
 				return null;
 			}
 		};
@@ -404,34 +422,42 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		return selectedCol;
 	}
 
-	@SuppressWarnings("unchecked")
-	public void addStringColumn(String name, String property) {
-		TableColumn<DATA_BINDING, String> stringColumn = new TableColumn<DATA_BINDING, String>(name);
-		stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		stringColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
-		columns.add(stringColumn);
+	
+	public enum ColumnType {
+
+		FIELD, DATE, LIST, CHECKBOX;
+	}
+
+	public void addColumn(String name, String property, ColumnType type, List<String> comboBoxList) {
+		
+		switch (type) {
+		case FIELD:
+			TableColumn<DATA_BINDING, String> stringColumn = new TableColumn<DATA_BINDING, String>(name);
+			stringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			stringColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
+			columns.add(stringColumn);
+			break;
+		case CHECKBOX:
+			TableColumn<DATA_BINDING, String> checkBoxColumn = new TableColumn<DATA_BINDING, String>(name);
+			checkBoxColumn.setCellFactory(column -> new CheckBoxTableCell<>());
+			checkBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
+			columns.add(checkBoxColumn);
+			break;
+		case LIST:
+			if (comboBoxList == null || comboBoxList.isEmpty()) throw new IllegalStateException("List must not be empty!");
+			TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
+			comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
+			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
+			columns.add(comboBoxColumn);
+			break;
+		default:
+			break;
+		}
+		
+
 		sortColumns();
 	}
 
-	@SuppressWarnings("unchecked")
-	public void addComboBoxColumn(String name, List<String> comboBoxList, String property) {
-		TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
-		comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
-		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
-		columns.add(comboBoxColumn);
-		sortColumns();
-	}
-
-	@SuppressWarnings("unchecked")
-	public void addCheckBoxColumn(String name, String property) {
-		TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
-		comboBoxColumn.setCellFactory(column -> new CheckBoxTableCell<>());
-		comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
-		columns.add(comboBoxColumn);
-		sortColumns();
-	}
-
-	@SuppressWarnings({ "unchecked" })
 	private void sortColumns() {
 		setEditableState();
 		headerCol.getColumns().clear();
@@ -495,4 +521,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			}
 		}
 	}
+	
+
+
 }

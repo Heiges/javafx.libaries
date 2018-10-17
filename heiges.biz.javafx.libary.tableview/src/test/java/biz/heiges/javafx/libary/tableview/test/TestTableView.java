@@ -1,5 +1,7 @@
 package biz.heiges.javafx.libary.tableview.test;
 
+import com.google.common.collect.Table;
+
 import heiges.biz.javafx.libary.tableview.TableView;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -37,9 +39,9 @@ public class TestTableView extends Application {
 		table.prefHeightProperty().bind(primaryBox.heightProperty());
 		table.prefWidthProperty().bind(primaryBox.widthProperty());
 		
-		table.addStringColumn("text", "text");
-		table.addCheckBoxColumn("checked", "checked");
-
+		table.addColumn("text", "text", TableView.ColumnType.FIELD,  null);
+		table.addColumn("checked", "checked", TableView.ColumnType.CHECKBOX, null);
+		
 		primaryBox.getChildren().add(table.getRootNode());
 		root.getChildren().add(primaryBox);
 		

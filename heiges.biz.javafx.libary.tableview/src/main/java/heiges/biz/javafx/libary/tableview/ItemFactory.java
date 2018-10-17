@@ -1,7 +1,8 @@
 package heiges.biz.javafx.libary.tableview;
 
 /**
- * Factory for building the date for a new line
+ * Factory for building the data for a new line
+ * 
  * @author Hansjoachim Heiges
  *
  */
