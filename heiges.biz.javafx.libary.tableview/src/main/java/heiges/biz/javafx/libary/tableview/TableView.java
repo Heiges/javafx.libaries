@@ -334,7 +334,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 				ObservableList<DATA_BINDING> items = table.getItems();
 				Iterator<DATA_BINDING> itemsIterator = items.iterator();
 				while (itemsIterator.hasNext()) {
-					DATA_BINDING binding = (DATA_BINDING) itemsIterator.next();
+					DATA_BINDING binding = itemsIterator.next();
 					if (binding.selectedProperty().getValue() == Boolean.TRUE) {
 						itemsIterator.remove();
 					}
@@ -515,11 +515,9 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		headerCol.getColumns().add(actionCol);
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void setEditableState() {
-		// FIXME parameterize raw type
-		for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
-			TableColumn column = (TableColumn) iterator.next();
+		for (Iterator<TableColumn<DATA_BINDING, ?>> iterator = columns.iterator(); iterator.hasNext();) {
+			TableColumn<DATA_BINDING, ?> column = iterator.next();
 			column.setEditable(currentEditableState);
 		}
 	}
