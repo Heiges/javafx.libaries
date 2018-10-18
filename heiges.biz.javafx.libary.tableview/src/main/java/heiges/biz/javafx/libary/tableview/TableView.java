@@ -520,6 +520,11 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		}
 	}
 	
+	private class WrappedTableView {
+		
+	}
 
-
+	private class DetailView {
+		
+	}
 }
