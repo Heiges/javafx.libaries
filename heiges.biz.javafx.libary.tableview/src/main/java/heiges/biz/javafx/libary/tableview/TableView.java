@@ -428,18 +428,56 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		DETAIL, TABLE, BOTH;
 	}
 	
+	private class TableProperty {
+
+		public String name; 
+		public String property; 
+		public ColumnType type; 
+		public List<String> comboBoxList;
+		
+		public String getName() {
+			return name;
+		}
+
+		public String getProperty() {
+			return property;
+		}
+
+		public ColumnType getType() {
+			return type;
+		}
+
+		public List<String> getComboBoxList() {
+			return comboBoxList;
+		}
+
+		
+		public TableProperty(String name, String property, ColumnType type, List<String> comboBoxList) {
+			this.name = name;
+			this.property = property; 
+			this.type = type; 
+			this.comboBoxList = comboBoxList;
+			}
+	}
+	
+	private ArrayList<TableProperty> propertiesForDetailView = new ArrayList<TableProperty>();
+	
+	private ArrayList<TableProperty> propertiesForFiltering = new ArrayList<TableProperty>();
+	
 	public void registerPropertyForView(String name, String property, ColumnType type, ViewType viewType, List<String> comboBoxList) {
 		
 		if (ViewType.DETAIL != viewType) { 
 			// add property as a column for viewtype == TABLE or BOTH
 			addColumn(name, property, type, comboBoxList);
-		}		
+		} else {
+			// for viewtype DETAIL only add the property to the registry
+			propertiesForDetailView.add(new TableProperty(name, property, type, comboBoxList));
+		}
 	}
 	
 	public void registerPropertyForFiltering(String name, String property, ColumnType type, List<String> comboBoxList) {
-		
+		propertiesForFiltering.add(new TableProperty(name, property, type, comboBoxList));
 	}
-
 	
 	private void addColumn(String name, String property, ColumnType type, List<String> comboBoxList) {
 		
@@ -534,10 +572,12 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private class WrappedTableView {
 		
 	}
 
+	@SuppressWarnings("unused")
 	private class DetailView {
 		
 	}
