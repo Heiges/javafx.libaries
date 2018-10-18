@@ -37,8 +37,8 @@ public class TestTableView extends Application {
 		table.prefHeightProperty().bind(primaryBox.heightProperty());
 		table.prefWidthProperty().bind(primaryBox.widthProperty());
 		
-		table.addColumn("text", "text", TableView.ColumnType.FIELD, TableView.ViewType.BOTH, null);
-		table.addColumn("checked", "checked", TableView.ColumnType.CHECKBOX, TableView.ViewType.BOTH,null);
+		table.registerPropertyForView("text", "text", TableView.ColumnType.FIELD, TableView.ViewType.BOTH, null);
+		table.registerPropertyForView("checked", "checked", TableView.ColumnType.CHECKBOX, TableView.ViewType.BOTH, null);
 		
 		primaryBox.getChildren().add(table.getRootNode());
 		root.getChildren().add(primaryBox);

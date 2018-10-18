@@ -428,7 +428,20 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		DETAIL, TABLE, BOTH;
 	}
 	
-	public void addColumn(String name, String property, ColumnType type, ViewType viewType, List<String> comboBoxList) {
+	public void registerPropertyForView(String name, String property, ColumnType type, ViewType viewType, List<String> comboBoxList) {
+		
+		if (ViewType.DETAIL != viewType) { 
+			// add property as a column for viewtype == TABLE or BOTH
+			addColumn(name, property, type, comboBoxList);
+		}		
+	}
+	
+	public void registerPropertyForFiltering(String name, String property, ColumnType type, List<String> comboBoxList) {
+		
+	}
+
+	
+	private void addColumn(String name, String property, ColumnType type, List<String> comboBoxList) {
 		
 		switch (type) {
 		case FIELD:
@@ -519,6 +532,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			}
 		}
 	}
+	
 	
 	private class WrappedTableView {
 		
