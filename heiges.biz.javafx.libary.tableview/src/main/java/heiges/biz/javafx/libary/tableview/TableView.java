@@ -1,5 +1,8 @@
 package heiges.biz.javafx.libary.tableview;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +13,7 @@ import heiges.biz.javafx.libary.tableview.cell.SelectThisRowCell;
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -142,8 +146,18 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 	}
 
 	private void updateDetailView(DATA_BINDING value) {
-		
-		field1.setText("changed");
+	   
+	    Class<? extends TableViewDataModelBinding> clazz = value.getClass();
+
+	    try {
+			Method method = value.getClass().getMethod("textProperty");
+			SimpleStringProperty invoke = (SimpleStringProperty) method.invoke(value);
+			System.out.println(invoke);
+			field1.setText(invoke.getValue());
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private Callback<DATA_BINDING, String> buildCallbackForEditView() {
