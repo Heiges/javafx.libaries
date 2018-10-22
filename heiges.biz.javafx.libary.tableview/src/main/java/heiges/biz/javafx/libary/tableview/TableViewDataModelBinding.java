@@ -1,8 +1,5 @@
 package heiges.biz.javafx.libary.tableview;
 
-import java.util.ArrayList;
-
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 
 /**
