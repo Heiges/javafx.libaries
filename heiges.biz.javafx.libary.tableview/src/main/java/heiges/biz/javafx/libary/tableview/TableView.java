@@ -89,9 +89,11 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
 		this.items = items;
 		
-		VBox vboxForDetailsView = buildDetailView();
 		
 		VBox vboxForTable = buildTableView(items, factory);
+		
+		VBox vboxForDetailsView = buildDetailView();
+
 		
 		// Build the stack pane containing the table and the details view.
 		// Bind the height and width properties of the stack pane and the vertical boxes of the table and details views
@@ -136,6 +138,15 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		grid.setHgap(10);
 		grid.setVgap(5);
 
+		;
+
+		int index = 0;
+		for (Iterator<TableProperty> iterator = propertiesForDetailView.iterator(); iterator.hasNext();) {
+			TableProperty v = (TableProperty) iterator.next();
+			grid.add(new Text(v.getName()), 0, index);
+			grid.add(field1, 1, index++);
+		}
+		
 	    grid.add(new Text("Field 1"), 0, 0); 	grid.add(field1, 1, 0);
 	    grid.add(new Text("Field 2"), 0, 1); 	grid.add(new Text("Inhalt 2"), 1, 1);
 	    grid.add(new Text("Field 2"), 0, 2); 	grid.add(new Text("Inhalt 3"), 1, 2);
@@ -480,12 +491,16 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 	
 	public void registerPropertyForView(String name, String property, ColumnType type, ViewType viewType, List<String> comboBoxList) {
 		
-		if (ViewType.DETAIL != viewType) { 
+		if (ViewType.BOTH == viewType) { 
 			// add property as a column for viewtype == TABLE or BOTH
 			addColumn(name, property, type, comboBoxList);
-		} else {
+			propertiesForDetailView.add(new TableProperty(name, property, type, comboBoxList));
+		} else if (ViewType.DETAIL == viewType) {
 			// for viewtype DETAIL only add the property to the registry
 			propertiesForDetailView.add(new TableProperty(name, property, type, comboBoxList));
+		}
+		else if (ViewType.TABLE == viewType) {
+			addColumn(name, property, type, comboBoxList);
 		}
 	}
 	
