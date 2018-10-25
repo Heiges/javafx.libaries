@@ -47,8 +47,10 @@ import javafx.util.Callback;
  */
 public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
+	private DetailView<DATA_BINDING> detailView = null;
+	
 //	private Text field1 = new Text("Inhalt 1");
-	private GridPane grid = new GridPane();
+//	private GridPane grid = new GridPane();
 
 	// A listener for changing an single item of the table
 	private TableView<DATA_BINDING>.ListChangeListenerImplementation listChangeListener = null;
@@ -94,7 +96,8 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
 		VBox vboxForTable = buildTableView(items, factory);
 
-		VBox vboxForDetailsView = buildDetailView();
+		detailView = new DetailView<>(this);
+//		VBox vboxForDetailsView = new DetailView<>(this);
 
 		// Build the stack pane containing the table and the details view.
 		// Bind the height and width properties of the stack pane and the vertical boxes
@@ -102,93 +105,11 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		root = new StackPane();
 		vboxForTable.prefHeightProperty().bind(root.heightProperty());
 		vboxForTable.prefWidthProperty().bind(root.widthProperty());
-		vboxForDetailsView.prefHeightProperty().bind(root.heightProperty());
-		vboxForDetailsView.prefWidthProperty().bind(root.widthProperty());
+		detailView.prefHeightProperty().bind(root.heightProperty());
+		detailView.prefWidthProperty().bind(root.widthProperty());
 
 		// Add the table and the detail view to the stack pane.
-		root.getChildren().addAll(vboxForDetailsView, vboxForTable);
-	}
-
-	private VBox buildDetailView() {
-
-		// Build the vertical wrapping box for the detail view.
-		VBox vboxForDetailsView = new VBox();
-		// TODO build a nice border similar to the border of the table view.
-
-		// Build the horizontal box for all needed buttons for the detail view.
-		// Set the alignment and bind the width to the wrapping vertical box.
-		HBox hboxForTopButtons = new HBox();
-		hboxForTopButtons.setAlignment(Pos.TOP_RIGHT);
-		hboxForTopButtons.prefWidthProperty().bind(vboxForDetailsView.widthProperty());
-
-		// Build the close button and the behavior and add it to the horizontal box.
-		Label closeLabelCross = new Label("\uF00D");
-		closeLabelCross.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
-		Button closeButton = new Button("", closeLabelCross);
-		closeButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				changeView(1);
-			}
-		});
-		hboxForTopButtons.getChildren().add(closeButton);
-
-		// Build some demo stuff for the detail view for experiemental purposes
-//		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(5);
-
-		int index = 0;
-		for (Iterator<TableProperty> iterator = propertiesForDetailView.iterator(); iterator.hasNext();) {
-			TableProperty v = (TableProperty) iterator.next();
-			grid.add(new Text(v.getName()), 0, index);
-			grid.add(new Text(v.getProperty()), 1, index++);
-		}
-
-//	    grid.add(new Text("Field 1"), 0, 0); 	grid.add(field1, 1, 0);
-//	    grid.add(new Text("Field 2"), 0, 1); 	grid.add(new Text("Inhalt 2"), 1, 1);
-//	    grid.add(new Text("Field 2"), 0, 2); 	grid.add(new Text("Inhalt 3"), 1, 2);
-
-		// add the horizontal box to the vertical box.
-		vboxForDetailsView.getChildren().addAll(hboxForTopButtons, grid);
-		return vboxForDetailsView;
-	}
-
-	private void updateDetailView(DATA_BINDING value) {
-
-		grid.getChildren().clear();
-
-		Class<? extends TableViewDataModelBinding> clazz = value.getClass();
-
-		int index = 0;
-		for (Iterator<TableProperty> iterator = propertiesForDetailView.iterator(); iterator.hasNext();) {
-			TableProperty v = (TableProperty) iterator.next();
-			grid.add(new Text(v.getName()), 0, index);
-
-			String text = null;
-			try {
-				Method method = value.getClass().getMethod(v.getProperty() + "Property");
-				
-				if (v.getType().equals(ColumnType.FIELD)) {
-					SimpleStringProperty invoke = (SimpleStringProperty) method.invoke(value);
-					text = invoke.getValue();
-				}
-				
-				if (v.getType().equals(ColumnType.CHECKBOX)) {
-					SimpleBooleanProperty invoke = (SimpleBooleanProperty) method.invoke(value);
-					text = invoke.getValue().toString();
-				}
-
-				
-			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			grid.add(new Text(text), 1, index++);
-		}
-
+		root.getChildren().addAll(detailView, vboxForTable);
 	}
 
 	private Callback<DATA_BINDING, String> buildCallbackForEditView() {
@@ -198,7 +119,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			public String call(DATA_BINDING param) {
 				System.out.println("edit view : Input parameter is " + param);
 				changeView(0); // 0 == Details 1 == table
-				updateDetailView(param);
+				detailView.updateDetailView(param);
 				return null;
 			}
 		};
@@ -212,13 +133,13 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 				System.out.println("detail  view : Input parameter is " + param);
 
 				changeView(0); // 0 == Details 1 == table
-				updateDetailView(param);
+				detailView.updateDetailView(param);
 				return null;
 			}
 		};
 	}
 
-	private void changeView(Integer viewIndex) {
+	protected void changeView(Integer viewIndex) {
 
 		ObservableList<Node> childs = root.getChildren();
 
@@ -467,6 +388,14 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 	}
 
 	private ArrayList<TableProperty> propertiesForDetailView = new ArrayList<TableProperty>();
+
+	protected ArrayList<TableProperty> getPropertiesForDetailView() {
+		return propertiesForDetailView;
+	}
+
+	protected ArrayList<TableProperty> getPropertiesForFiltering() {
+		return propertiesForFiltering;
+	}
 
 	private ArrayList<TableProperty> propertiesForFiltering = new ArrayList<TableProperty>();
 
