@@ -1,6 +1,8 @@
 package biz.heiges.javafx.libary.tableview.test;
 
+import heiges.biz.javafx.libary.tableview.ColumnType;
 import heiges.biz.javafx.libary.tableview.TableView;
+import heiges.biz.javafx.libary.tableview.ViewType;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,8 +39,8 @@ public class TestTableView extends Application {
 		table.prefHeightProperty().bind(primaryBox.heightProperty());
 		table.prefWidthProperty().bind(primaryBox.widthProperty());
 		
-		table.registerPropertyForView("text", "text", TableView.ColumnType.FIELD, TableView.ViewType.BOTH, null);
-		table.registerPropertyForView("checked", "checked", TableView.ColumnType.CHECKBOX, TableView.ViewType.BOTH, null);
+		table.registerPropertyForView("text", "text", ColumnType.FIELD, ViewType.BOTH, null);
+		table.registerPropertyForView("checked", "checked", ColumnType.CHECKBOX, ViewType.BOTH, null);
 		
 		primaryBox.getChildren().add(table.getRootNode());
 		root.getChildren().add(primaryBox);

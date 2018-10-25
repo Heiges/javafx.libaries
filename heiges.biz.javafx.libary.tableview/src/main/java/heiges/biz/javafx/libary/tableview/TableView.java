@@ -41,7 +41,8 @@ import javafx.util.Callback;
  * A tableview with additional functionality.
  * 
  * @author Hansjoachim Heiges
- *
+ * @since 0.1
+ * @version 0.1
  * @param <DATA_BINDING> the data model for the items of the table view.
  */
 public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
@@ -465,45 +466,6 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		return selectedCol;
 	}
 
-	public enum ColumnType {
-		FIELD, DATE, LIST, CHECKBOX;
-	}
-
-	public enum ViewType {
-		DETAIL, TABLE, BOTH;
-	}
-
-	private class TableProperty {
-
-		public String name;
-		public String property;
-		public ColumnType type;
-		public List<String> comboBoxList;
-
-		public String getName() {
-			return name;
-		}
-
-		public String getProperty() {
-			return property;
-		}
-
-		public ColumnType getType() {
-			return type;
-		}
-
-		public List<String> getComboBoxList() {
-			return comboBoxList;
-		}
-
-		public TableProperty(String name, String property, ColumnType type, List<String> comboBoxList) {
-			this.name = name;
-			this.property = property;
-			this.type = type;
-			this.comboBoxList = comboBoxList;
-		}
-	}
-
 	private ArrayList<TableProperty> propertiesForDetailView = new ArrayList<TableProperty>();
 
 	private ArrayList<TableProperty> propertiesForFiltering = new ArrayList<TableProperty>();
@@ -616,15 +578,5 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 				}
 			}
 		}
-	}
-
-	@SuppressWarnings("unused")
-	private class WrappedTableView {
-
-	}
-
-	@SuppressWarnings("unused")
-	private class DetailView {
-
 	}
 }
