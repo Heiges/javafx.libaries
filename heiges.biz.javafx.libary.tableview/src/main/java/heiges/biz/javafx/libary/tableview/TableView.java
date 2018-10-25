@@ -13,6 +13,7 @@ import heiges.biz.javafx.libary.tableview.cell.SelectThisRowCell;
 import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -45,8 +46,9 @@ import javafx.util.Callback;
  */
 public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 
-	private Text field1 = new Text("Inhalt 1");
-	
+//	private Text field1 = new Text("Inhalt 1");
+	private GridPane grid = new GridPane();
+
 	// A listener for changing an single item of the table
 	private TableView<DATA_BINDING>.ListChangeListenerImplementation listChangeListener = null;
 
@@ -61,9 +63,9 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 	private TableColumn<DATA_BINDING, Boolean> actionCol = null;
 
 	private List<TableColumn<DATA_BINDING, ?>> columns = new ArrayList<>();
-	
+
 	StackPane root = null;
-	
+
 	ObservableList<DATA_BINDING> items;
 
 	private CheckBox selectAllRowsCheckBox = null;
@@ -88,39 +90,36 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 	public TableView(ObservableList<DATA_BINDING> items, ItemFactory factory) {
 
 		this.items = items;
-		
-		
+
 		VBox vboxForTable = buildTableView(items, factory);
-		
+
 		VBox vboxForDetailsView = buildDetailView();
 
-		
 		// Build the stack pane containing the table and the details view.
-		// Bind the height and width properties of the stack pane and the vertical boxes of the table and details views
+		// Bind the height and width properties of the stack pane and the vertical boxes
+		// of the table and details views
 		root = new StackPane();
 		vboxForTable.prefHeightProperty().bind(root.heightProperty());
 		vboxForTable.prefWidthProperty().bind(root.widthProperty());
 		vboxForDetailsView.prefHeightProperty().bind(root.heightProperty());
 		vboxForDetailsView.prefWidthProperty().bind(root.widthProperty());
-		
+
 		// Add the table and the detail view to the stack pane.
 		root.getChildren().addAll(vboxForDetailsView, vboxForTable);
 	}
 
-
-
 	private VBox buildDetailView() {
-		
-		// Build the vertical wrapping box for the detail view. 
+
+		// Build the vertical wrapping box for the detail view.
 		VBox vboxForDetailsView = new VBox();
 		// TODO build a nice border similar to the border of the table view.
-		
+
 		// Build the horizontal box for all needed buttons for the detail view.
 		// Set the alignment and bind the width to the wrapping vertical box.
-		HBox hboxForTopButtons = new HBox();	
+		HBox hboxForTopButtons = new HBox();
 		hboxForTopButtons.setAlignment(Pos.TOP_RIGHT);
 		hboxForTopButtons.prefWidthProperty().bind(vboxForDetailsView.widthProperty());
-		
+
 		// Build the close button and the behavior and add it to the horizontal box.
 		Label closeLabelCross = new Label("\uF00D");
 		closeLabelCross.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
@@ -132,45 +131,65 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			}
 		});
 		hboxForTopButtons.getChildren().add(closeButton);
-		
+
 		// Build some demo stuff for the detail view for experiemental purposes
-		GridPane grid = new GridPane();
+//		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(5);
-
-		;
 
 		int index = 0;
 		for (Iterator<TableProperty> iterator = propertiesForDetailView.iterator(); iterator.hasNext();) {
 			TableProperty v = (TableProperty) iterator.next();
 			grid.add(new Text(v.getName()), 0, index);
-			grid.add(field1, 1, index++);
+			grid.add(new Text(v.getProperty()), 1, index++);
 		}
-		
-	    grid.add(new Text("Field 1"), 0, 0); 	grid.add(field1, 1, 0);
-	    grid.add(new Text("Field 2"), 0, 1); 	grid.add(new Text("Inhalt 2"), 1, 1);
-	    grid.add(new Text("Field 2"), 0, 2); 	grid.add(new Text("Inhalt 3"), 1, 2);
-	    
+
+//	    grid.add(new Text("Field 1"), 0, 0); 	grid.add(field1, 1, 0);
+//	    grid.add(new Text("Field 2"), 0, 1); 	grid.add(new Text("Inhalt 2"), 1, 1);
+//	    grid.add(new Text("Field 2"), 0, 2); 	grid.add(new Text("Inhalt 3"), 1, 2);
+
 		// add the horizontal box to the vertical box.
 		vboxForDetailsView.getChildren().addAll(hboxForTopButtons, grid);
 		return vboxForDetailsView;
 	}
 
 	private void updateDetailView(DATA_BINDING value) {
-	   
-	    Class<? extends TableViewDataModelBinding> clazz = value.getClass();
 
-	    try {
-			Method method = value.getClass().getMethod("textProperty");
-			SimpleStringProperty invoke = (SimpleStringProperty) method.invoke(value);
-			System.out.println(invoke);
-			field1.setText(invoke.getValue());
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		grid.getChildren().clear();
+
+		Class<? extends TableViewDataModelBinding> clazz = value.getClass();
+
+		int index = 0;
+		for (Iterator<TableProperty> iterator = propertiesForDetailView.iterator(); iterator.hasNext();) {
+			TableProperty v = (TableProperty) iterator.next();
+			grid.add(new Text(v.getName()), 0, index);
+
+			String text = null;
+			try {
+				Method method = value.getClass().getMethod(v.getProperty() + "Property");
+				
+				if (v.getType().equals(ColumnType.FIELD)) {
+					SimpleStringProperty invoke = (SimpleStringProperty) method.invoke(value);
+					text = invoke.getValue();
+				}
+				
+				if (v.getType().equals(ColumnType.CHECKBOX)) {
+					SimpleBooleanProperty invoke = (SimpleBooleanProperty) method.invoke(value);
+					text = invoke.getValue().toString();
+				}
+
+				
+			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			grid.add(new Text(text), 1, index++);
 		}
+
 	}
-	
+
 	private Callback<DATA_BINDING, String> buildCallbackForEditView() {
 
 		return new Callback<DATA_BINDING, String>() {
@@ -183,37 +202,35 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			}
 		};
 	}
-	
+
 	private Callback<DATA_BINDING, String> buildCallbackForDetailView() {
-		
+
 		return new Callback<DATA_BINDING, String>() {
 			@Override
 			public String call(DATA_BINDING param) {
 				System.out.println("detail  view : Input parameter is " + param);
-				
+
 				changeView(0); // 0 == Details 1 == table
 				updateDetailView(param);
 				return null;
 			}
 		};
 	}
-	
-	
+
 	private void changeView(Integer viewIndex) {
 
 		ObservableList<Node> childs = root.getChildren();
-			
+
 		Node topNode = childs.get(1);
 		Node newTopNode = childs.get(0);
-   
+
 		topNode.setVisible(false);
-		topNode.toBack();          
+		topNode.toBack();
 		newTopNode.setVisible(true);
 	}
-	
-	
+
 	private VBox buildTableView(ObservableList<DATA_BINDING> items, ItemFactory factory) {
-		
+
 		// Build the table and the wrapping vertical box for the table.
 		VBox vboxForTable = new VBox();
 		table = new javafx.scene.control.TableView<DATA_BINDING>(items);
@@ -221,7 +238,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		table.prefHeightProperty().bind(vboxForTable.heightProperty());
 		table.prefWidthProperty().bind(vboxForTable.widthProperty());
 		table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);
-		
+
 		// Build the header column and add it to the table.
 		headerCol = new TableColumn<DATA_BINDING, String>("");
 		table.getColumns().add(headerCol);
@@ -250,10 +267,12 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 //		actionCol.cellFactoryProperty().set(actionCell);  // compiles not casting error
 //		actionCol.setCellFactory(actionCell);  // compiles not casting error
 //		
-		// FIXME instead of setting the callbacks via constructor, use a prebuild instance, but handle the casting problem then.
-		actionCol.setCellFactory(cellFactory -> new ActionCell<DATA_BINDING, Boolean>(buildCallbackForEditView(), buildCallbackForDetailView()));
+		// FIXME instead of setting the callbacks via constructor, use a prebuild
+		// instance, but handle the casting problem then.
+		actionCol.setCellFactory(cellFactory -> new ActionCell<DATA_BINDING, Boolean>(buildCallbackForEditView(),
+				buildCallbackForDetailView()));
 		actionCol.setSortable(false);
-	
+
 		// Add selectAllRows check box to the selectARowColumn column header. The
 		// checkBox will be connected with the checkBox cellFactory for displaying the
 		// state of the check box.
@@ -277,15 +296,16 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		actionBox.getChildren().addAll(buttonNew, buttonDelete, editButton);
 		headerCol.setGraphic(actionBox);
 
-		// set table to editable true, else the selectThisRowCheckBox will not be usable.
+		// set table to editable true, else the selectThisRowCheckBox will not be
+		// usable.
 		table.setEditable(true);
 
 		updateObservableItems(items);
-		
+
 		buildListChangeListener(items);
-		
+
 		addListChangeListerToObservableItems();
-		
+
 		return vboxForTable;
 	}
 
@@ -452,14 +472,14 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 	public enum ViewType {
 		DETAIL, TABLE, BOTH;
 	}
-	
+
 	private class TableProperty {
 
-		public String name; 
-		public String property; 
-		public ColumnType type; 
+		public String name;
+		public String property;
+		public ColumnType type;
 		public List<String> comboBoxList;
-		
+
 		public String getName() {
 			return name;
 		}
@@ -476,40 +496,39 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			return comboBoxList;
 		}
 
-		
 		public TableProperty(String name, String property, ColumnType type, List<String> comboBoxList) {
 			this.name = name;
-			this.property = property; 
-			this.type = type; 
+			this.property = property;
+			this.type = type;
 			this.comboBoxList = comboBoxList;
-			}
+		}
 	}
-	
+
 	private ArrayList<TableProperty> propertiesForDetailView = new ArrayList<TableProperty>();
-	
+
 	private ArrayList<TableProperty> propertiesForFiltering = new ArrayList<TableProperty>();
-	
-	public void registerPropertyForView(String name, String property, ColumnType type, ViewType viewType, List<String> comboBoxList) {
-		
-		if (ViewType.BOTH == viewType) { 
+
+	public void registerPropertyForView(String name, String property, ColumnType type, ViewType viewType,
+			List<String> comboBoxList) {
+
+		if (ViewType.BOTH == viewType) {
 			// add property as a column for viewtype == TABLE or BOTH
 			addColumn(name, property, type, comboBoxList);
 			propertiesForDetailView.add(new TableProperty(name, property, type, comboBoxList));
 		} else if (ViewType.DETAIL == viewType) {
 			// for viewtype DETAIL only add the property to the registry
 			propertiesForDetailView.add(new TableProperty(name, property, type, comboBoxList));
-		}
-		else if (ViewType.TABLE == viewType) {
+		} else if (ViewType.TABLE == viewType) {
 			addColumn(name, property, type, comboBoxList);
 		}
 	}
-	
+
 	public void registerPropertyForFiltering(String name, String property, ColumnType type, List<String> comboBoxList) {
 		propertiesForFiltering.add(new TableProperty(name, property, type, comboBoxList));
 	}
-	
+
 	private void addColumn(String name, String property, ColumnType type, List<String> comboBoxList) {
-		
+
 		switch (type) {
 		case FIELD:
 			TableColumn<DATA_BINDING, String> stringColumn = new TableColumn<DATA_BINDING, String>(name);
@@ -524,7 +543,8 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			columns.add(checkBoxColumn);
 			break;
 		case LIST:
-			if (comboBoxList == null || comboBoxList.isEmpty()) throw new IllegalStateException("List must not be empty!");
+			if (comboBoxList == null || comboBoxList.isEmpty())
+				throw new IllegalStateException("List must not be empty!");
 			TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
 			comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
@@ -535,7 +555,7 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 		}
 		sortColumns();
 	}
-	
+
 	private void sortColumns() {
 		setEditableState();
 		headerCol.getColumns().clear();
@@ -597,15 +617,14 @@ public class TableView<DATA_BINDING extends TableViewDataModelBinding> {
 			}
 		}
 	}
-	
-	
+
 	@SuppressWarnings("unused")
 	private class WrappedTableView {
-		
+
 	}
 
 	@SuppressWarnings("unused")
 	private class DetailView {
-		
+
 	}
 }
