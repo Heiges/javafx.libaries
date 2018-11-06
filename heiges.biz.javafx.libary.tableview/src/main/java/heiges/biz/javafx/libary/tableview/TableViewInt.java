@@ -32,7 +32,7 @@ import javafx.util.Callback;
  * @since 0.2
  * @version 0.1
  */
-public class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
+class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 
 	/**
 	 * The wrapped table.
