@@ -7,7 +7,6 @@ import java.util.List;
 import heiges.biz.javafx.libary.commons.Fonts;
 import heiges.biz.javafx.libary.tableview.cell.ActionCell;
 import heiges.biz.javafx.libary.tableview.cell.SelectThisRowCell;
-import heiges.biz.javafx.libary.tableview.cellfactories.ComboBoxCellFactory;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -21,6 +20,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
@@ -193,10 +193,9 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 			columns.add(checkBoxColumn);
 			break;
 		case LIST:
-			if (comboBoxList == null || comboBoxList.isEmpty())
-				throw new IllegalStateException("List must not be empty!");
+			if (comboBoxList == null || comboBoxList.isEmpty())	throw new IllegalStateException("List must not be empty!");
 			TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
-			comboBoxColumn.setCellFactory(new ComboBoxCellFactory<>(comboBoxList));
+			comboBoxColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(comboBoxList)));
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
 			columns.add(comboBoxColumn);
 			break;

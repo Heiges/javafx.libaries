@@ -1,5 +1,8 @@
 package biz.heiges.javafx.libary.tableview.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -39,4 +42,16 @@ public class TestTableViewBinding extends TableViewDataModelBinding {
 	public SimpleBooleanProperty checkedProperty() {
 		return checked;
 	}
+	
+	
+
+	
+	private SimpleStringProperty listSelected = new SimpleStringProperty("foo");
+	
+	public SimpleStringProperty listSelectedProperty() {
+		return listSelected;
+	}
+
+	
+	
 }

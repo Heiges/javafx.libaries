@@ -1,5 +1,7 @@
 package biz.heiges.javafx.libary.tableview.test;
 
+import java.util.ArrayList;
+
 import heiges.biz.javafx.libary.tableview.ColumnType;
 import heiges.biz.javafx.libary.tableview.TableView;
 import heiges.biz.javafx.libary.tableview.ViewType;
@@ -41,6 +43,12 @@ public class TestTableView extends Application {
 		
 		table.registerPropertyForView("text", "text", ColumnType.FIELD, ViewType.BOTH, null);
 		table.registerPropertyForView("checked", "checked", ColumnType.CHECKBOX, ViewType.BOTH, null);
+		
+		ArrayList list = new ArrayList();
+		list.add("foo");
+		list.add("bar");
+		
+		table.registerPropertyForView("list", "listSelected", ColumnType.LIST, ViewType.BOTH, list);
 		
 		primaryBox.getChildren().add(table.getRootNode());
 		root.getChildren().add(primaryBox);
