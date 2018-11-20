@@ -44,9 +44,10 @@ public class TestTableView extends Application {
 		table.registerPropertyForView("text", "text", ColumnType.FIELD, ViewType.BOTH, null);
 		table.registerPropertyForView("checked", "checked", ColumnType.CHECKBOX, ViewType.BOTH, null);
 		
-		ArrayList list = new ArrayList();
-		list.add("foo");
-		list.add("bar");
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("val1");
+		list.add("val2");
+		list.add("val3");
 		
 		table.registerPropertyForView("list", "listSelected", ColumnType.LIST, ViewType.BOTH, list);
 		
@@ -65,7 +66,8 @@ public class TestTableView extends Application {
 			System.out.println(
 					  "row is selected = " + testTableViewBinding.selectedProperty().getValue()
 					+ " || text = " + testTableViewBinding.getText() 
-					+ " || checked = " + testTableViewBinding.getChecked()); 					
+					+ " || checked = " + testTableViewBinding.getChecked()
+			        + " || list selected = " + testTableViewBinding.getListSelected());
 		}
 	}
 	
@@ -79,12 +81,4 @@ public class TestTableView extends Application {
 		data.addAll(binding, binding2);
 		return data;
 	}	
-	
-//	private List<String> buildComboBoxList() {
-//		List<String> l = new ArrayList<String>();
-//		l.add("val1");
-//		l.add("val2");
-//		l.add("val3");
-//		return l;
-//	}
 }
