@@ -80,6 +80,11 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 					SimpleBooleanProperty invoke = (SimpleBooleanProperty) method.invoke(value);
 					text = invoke.getValue().toString();
 				}
+				
+				if(v.getType().equals(ColumnType.LIST)) {
+					SimpleStringProperty invoke = (SimpleStringProperty) method.invoke(value);
+					text = invoke.getValue();
+				}
 
 			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
