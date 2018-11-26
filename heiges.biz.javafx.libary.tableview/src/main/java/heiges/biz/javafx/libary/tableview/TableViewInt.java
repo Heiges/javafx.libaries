@@ -313,7 +313,6 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 	}
 
 	private void setEditableState() {
-		table.setEditable(currentEditableState);
 		for (Iterator<TableColumn<DATA_BINDING, ?>> iterator = columns.iterator(); iterator.hasNext();) {
 			TableColumn<DATA_BINDING, ?> column = iterator.next();
 			column.setEditable(currentEditableState);
