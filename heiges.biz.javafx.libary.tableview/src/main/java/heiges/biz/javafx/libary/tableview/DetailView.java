@@ -12,6 +12,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -54,6 +56,13 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 		grid.setHgap(10);
 		grid.setVgap(5);
 
+	    this.setStyle("-fx-padding: 10;" + 
+                "-fx-border-style: solid inside;" + 
+                "-fx-border-width: 2;" +
+                "-fx-border-insets: 0;" + 
+                "-fx-border-radius: 0;" + 
+                "-fx-border-color: blue;");
+		
 		// add the horizontal box to the vertical box.
 		this.getChildren().addAll(hboxForTopButtons, grid);
 	}
