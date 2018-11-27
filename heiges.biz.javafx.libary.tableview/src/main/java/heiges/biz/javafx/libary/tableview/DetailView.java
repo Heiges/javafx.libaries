@@ -9,12 +9,20 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 /**
@@ -53,13 +61,8 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 		// Set the layout for the grid containing the controls for the detail view
 		grid.setHgap(10);
 		grid.setVgap(5);
-
-	    this.setStyle("-fx-padding: 10;" + 
-                "-fx-border-style: solid inside;" + 
-                "-fx-border-width: 2;" +
-                "-fx-border-insets: 0;" + 
-                "-fx-border-radius: 0;" + 
-                "-fx-border-color: blue;");
+		
+		this.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, new CornerRadii(0), new BorderWidths(2), new Insets(0,0,0,0))));
 		
 		// add the horizontal box to the vertical box.
 		this.getChildren().addAll(hboxForTopButtons, grid);
@@ -72,6 +75,8 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 		int index = 0;
 		for (Iterator<TableProperty> iterator = parent.getPropertiesForDetailView().iterator(); iterator.hasNext();) {
 			TableProperty v = (TableProperty) iterator.next();
+			
+			// build the label
 			grid.add(new Text(v.getName()), 0, index);
 
 			String text = null;
@@ -99,7 +104,10 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 				e.printStackTrace();
 			}
 
-			grid.add(new Text(text), 1, index++);
+			TextField textField = new TextField(text);
+			textField.prefWidthProperty().bind(grid.widthProperty());
+			
+			grid.add(textField, 1, index++);
 		}
 	}
 }
