@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -38,15 +39,6 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 	 * The wrapped table.
 	 */
 	private javafx.scene.control.TableView<DATA_BINDING> table = null;
-
-	/**
-	 * The main column, all other columns will be added as child columns and will be
-	 * arranged below the main column. The main column will be used for all action
-	 * buttons the affect all items (rows) in the table or the table itself (e.g.
-	 * the delete button will only affect selected rows while the new button will
-	 * add a new item to the table
-	 */
-	private TableColumn<DATA_BINDING, String> headerCol = null;
 
 	/**
 	 * The check box for selecting all rows in the table.
@@ -75,27 +67,16 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 
 		this.parent = parent;
 
+		// build the table
 		table = new javafx.scene.control.TableView<DATA_BINDING>(items);
-		this.getChildren().add(table);
 		table.prefHeightProperty().bind(this.heightProperty());
 		table.prefWidthProperty().bind(this.widthProperty());
 		table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);
 
-		// Build the header column and add it to the table.
-		headerCol = new TableColumn<DATA_BINDING, String>("");
-		table.getColumns().add(headerCol);
-
-		// Build the selection box and the SelectionBoxCellFactory. The
-		// SelectionBoxCellFactory will need the selection box for construction.
-		selectAllRowsCheckBox = buildSelectAllRowsCheckBox();
-		selectAllRowsCheckBox.setPadding(new Insets(0, 5, 0, 0));
-
-		// Build the selectARowColumn. This is the first column and will display the
-		// selectIt action button for selecting or unselecting a row
+		// build the column for selecting a row in the table
 		selectARowColumn = buildSelectedColumn();
 		selectARowColumn.setCellFactory(cellFactory -> new SelectThisRowCell<>());
 
-		// NEU
 		// FIXME what is the correct Type for a row with buttons only?
 		actionCol = new TableColumn<DATA_BINDING, Boolean>("");
 		actionCol.setId("actionCol");
@@ -115,28 +96,27 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 				buildCallbackForDetailView()));
 		actionCol.setSortable(false);
 
-		// Add selectAllRows check box to the selectARowColumn column header. The
-		// checkBox will be connected with the checkBox cellFactory for displaying the
-		// state of the check box.
+		// build the checkbox for selecting all rows in the table
+		selectAllRowsCheckBox = buildSelectAllRowsCheckBox();
+		selectAllRowsCheckBox.setPadding(new Insets(0, 5, 0, 0));
+
 		HBox selectARowColumnHeaderBox = new HBox();
 		HBox.setMargin(selectAllRowsCheckBox, new Insets(5, 0, 5, 5));
 		selectARowColumnHeaderBox.setAlignment(Pos.CENTER_RIGHT);
 		selectARowColumnHeaderBox.getChildren().addAll(selectAllRowsCheckBox);
 		selectARowColumn.setGraphic(selectARowColumnHeaderBox);
 
-		// Build all needed action buttons and add it to header column of the table. The
-		// selectAllRowsCheckBox will be connected with the new action button for
-		// changing the state if a new item is added to the table.
 		Button buttonNew = buildButtonNew(factory, selectAllRowsCheckBox);
 		Button buttonDelete = buildButtonDelete();
 		Button editButton = buildButtonEdit();
-		HBox actionBox = new HBox();
 		HBox.setMargin(buttonNew, new Insets(5, 0, 5, 5));
 		HBox.setMargin(buttonDelete, new Insets(5, 0, 5, 5));
 		HBox.setMargin(editButton, new Insets(5, 0, 5, 5));
-		actionBox.setAlignment(Pos.TOP_LEFT);
-		actionBox.getChildren().addAll(buttonNew, buttonDelete, editButton);
-		headerCol.setGraphic(actionBox);
+
+		ToolBar toolBar = new ToolBar();
+		toolBar.getItems().addAll(buttonNew, buttonDelete, editButton);
+
+		this.getChildren().addAll(toolBar, table);
 
 		// set table to editable true, else the selectThisRowCheckBox will not be
 		// usable.
@@ -193,9 +173,11 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 			columns.add(checkBoxColumn);
 			break;
 		case LIST:
-			if (comboBoxList == null || comboBoxList.isEmpty())	throw new IllegalStateException("List must not be empty!");
+			if (comboBoxList == null || comboBoxList.isEmpty())
+				throw new IllegalStateException("List must not be empty!");
 			TableColumn<DATA_BINDING, String> comboBoxColumn = new TableColumn<DATA_BINDING, String>(name);
-			comboBoxColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(comboBoxList)));
+			comboBoxColumn
+					.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(comboBoxList)));
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<DATA_BINDING, String>(property));
 			columns.add(comboBoxColumn);
 			break;
@@ -207,10 +189,10 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 
 	protected void sortColumns() {
 		setEditableState();
-		headerCol.getColumns().clear();
-		headerCol.getColumns().add(selectARowColumn);
-		headerCol.getColumns().addAll(columns);
-		headerCol.getColumns().add(actionCol);
+		table.getColumns().clear();
+		table.getColumns().add(selectARowColumn);
+		table.getColumns().addAll(columns);
+		table.getColumns().add(actionCol);
 	}
 
 	/**
