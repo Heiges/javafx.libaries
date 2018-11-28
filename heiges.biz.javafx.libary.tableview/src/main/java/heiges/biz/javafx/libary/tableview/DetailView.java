@@ -10,17 +10,16 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -40,12 +39,6 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 
 		this.parent = parent;
 
-		// Build the horizontal box for all needed buttons for the detail view.
-		// Set the alignment and bind the width to the wrapping vertical box.
-		HBox hboxForTopButtons = new HBox();
-		hboxForTopButtons.setAlignment(Pos.TOP_RIGHT);
-		hboxForTopButtons.prefWidthProperty().bind(this.widthProperty());
-
 		// Build the close button and the behavior and add it to the horizontal box.
 		Label closeLabelCross = new Label("\uF00D");
 		closeLabelCross.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
@@ -56,16 +49,19 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 				parent.changeView(1);
 			}
 		});
-		hboxForTopButtons.getChildren().add(closeButton);
 
 		// Set the layout for the grid containing the controls for the detail view
 		grid.setHgap(10);
 		grid.setVgap(5);
-		
-		this.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, new CornerRadii(0), new BorderWidths(2), new Insets(0,0,0,0))));
-		
+
+		this.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, new CornerRadii(0),
+				new BorderWidths(2), new Insets(0, 0, 0, 0))));
+
+		ToolBar toolbar = new ToolBar();
+		toolbar.getItems().add(closeButton);
+
 		// add the horizontal box to the vertical box.
-		this.getChildren().addAll(hboxForTopButtons, grid);
+		this.getChildren().addAll(toolbar, grid);
 	}
 
 	protected void updateDetailView(DATA_BINDING value) {
@@ -75,7 +71,7 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 		int index = 0;
 		for (Iterator<TableProperty> iterator = parent.getPropertiesForDetailView().iterator(); iterator.hasNext();) {
 			TableProperty v = (TableProperty) iterator.next();
-			
+
 			// build the label
 			grid.add(new Text(v.getName()), 0, index);
 
@@ -92,8 +88,8 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 					SimpleBooleanProperty invoke = (SimpleBooleanProperty) method.invoke(value);
 					text = invoke.getValue().toString();
 				}
-				
-				if(v.getType().equals(ColumnType.LIST)) {
+
+				if (v.getType().equals(ColumnType.LIST)) {
 					SimpleStringProperty invoke = (SimpleStringProperty) method.invoke(value);
 					text = invoke.getValue();
 				}
@@ -106,7 +102,7 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 
 			TextField textField = new TextField(text);
 			textField.prefWidthProperty().bind(grid.widthProperty());
-			
+
 			grid.add(textField, 1, index++);
 		}
 	}
