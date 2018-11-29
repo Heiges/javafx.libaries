@@ -44,8 +44,9 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 		// Set the layout for the grid containing the controls for the detail view
 		grid.setHgap(10);
 		grid.setVgap(5);
+		grid.setPadding(new Insets(10,10,10,10));
 
-		this.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, new CornerRadii(0),
+		this.setBorder(new Border(new BorderStroke(Color.LIGHTGREY, BorderStrokeStyle.SOLID, new CornerRadii(0),
 				new BorderWidths(2), new Insets(0, 0, 0, 0))));
 
 		ToolBar toolbar = new ToolBar();
