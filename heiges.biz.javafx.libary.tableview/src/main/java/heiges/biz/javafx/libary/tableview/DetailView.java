@@ -39,16 +39,7 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 
 		this.parent = parent;
 
-		// Build the close button and the behavior and add it to the horizontal box.
-		Label closeLabelCross = new Label("\uF00D");
-		closeLabelCross.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
-		Button closeButton = new Button("", closeLabelCross);
-		closeButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				parent.changeView(1);
-			}
-		});
+		Button closeButton = buildButtonClose(parent);
 
 		// Set the layout for the grid containing the controls for the detail view
 		grid.setHgap(10);
@@ -62,6 +53,20 @@ class DetailView<DATA_BINDING extends TableViewDataModelBinding> extends VBox {
 
 		// add the horizontal box to the vertical box.
 		this.getChildren().addAll(toolbar, grid);
+	}
+
+	private Button buildButtonClose(TableView<DATA_BINDING> parent) {
+		// Build the close button and the behavior and add it to the horizontal box.
+		Label closeLabelCross = new Label("\uF00D");
+		closeLabelCross.setFont(Fonts.getFont("/fa/fontawesome-webfont.ttf", 15));
+		Button closeButton = new Button("", closeLabelCross);
+		closeButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				parent.changeView(1);
+			}
+		});
+		return closeButton;
 	}
 
 	protected void updateDetailView(DATA_BINDING value) {
