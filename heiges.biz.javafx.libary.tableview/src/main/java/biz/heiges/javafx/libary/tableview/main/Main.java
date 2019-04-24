@@ -1,7 +1,9 @@
-package biz.heiges.javafx.libary.tableview.test;
+package biz.heiges.javafx.libary.tableview.main;
 
 import java.util.ArrayList;
 
+import biz.heiges.javafx.libary.tableview.test.TestItemFactory;
+import biz.heiges.javafx.libary.tableview.test.TestTableViewBinding;
 import heiges.biz.javafx.libary.tableview.ColumnType;
 import heiges.biz.javafx.libary.tableview.TableView;
 import heiges.biz.javafx.libary.tableview.ViewType;
@@ -14,7 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class TestTableView extends Application {
+public class Main extends Application {
 	
 	ObservableList<TestTableViewBinding> data = FXCollections.observableArrayList();
 		
