@@ -1,12 +1,12 @@
-package heiges.biz.javafx.libary.tableview;
+package biz.heiges.javafx.libary.tableview;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import heiges.biz.javafx.libary.commons.Fonts;
-import heiges.biz.javafx.libary.tableview.cell.ActionCell;
-import heiges.biz.javafx.libary.tableview.cell.SelectThisRowCell;
+import biz.heiges.javafx.libary.commons.Fonts;
+import biz.heiges.javafx.libary.tableview.cell.ActionCell;
+import biz.heiges.javafx.libary.tableview.cell.SelectThisRowCell;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -92,8 +92,9 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 //		
 		// FIXME instead of setting the callbacks via constructor, use a prebuild
 		// instance, but handle the casting problem then.
-		actionCol.setCellFactory(cellFactory -> new ActionCell<DATA_BINDING, Boolean>(buildCallbackForEditView(),
-				buildCallbackForDetailView()));
+		// FIXME DATABINDING 
+//		actionCol.setCellFactory(cellFactory -> new ActionCell<DATA_BINDING, Boolean>(buildCallbackForEditView(),
+//				buildCallbackForDetailView()));
 		actionCol.setSortable(false);
 
 		// build the checkbox for selecting all rows in the table

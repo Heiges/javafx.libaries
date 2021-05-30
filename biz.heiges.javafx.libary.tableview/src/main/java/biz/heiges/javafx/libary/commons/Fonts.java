@@ -1,10 +1,10 @@
-package heiges.biz.javafx.libary.commons;
+package biz.heiges.javafx.libary.commons;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import heiges.biz.javafx.libary.tableview.TableView;
+import biz.heiges.javafx.libary.tableview.TableView;
 import javafx.scene.text.Font;
 
 public class Fonts {
