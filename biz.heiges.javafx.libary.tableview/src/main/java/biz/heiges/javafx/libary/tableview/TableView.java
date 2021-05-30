@@ -3,7 +3,6 @@ package biz.heiges.javafx.libary.tableview;
 import java.util.ArrayList;
 import java.util.List;
 
-import biz.heiges.javafx.libary.tableview.main.ViewType;
 import javafx.beans.property.Property;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;

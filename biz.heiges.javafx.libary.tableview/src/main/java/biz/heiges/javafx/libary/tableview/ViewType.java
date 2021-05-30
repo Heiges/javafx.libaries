@@ -1,4 +1,4 @@
-package biz.heiges.javafx.libary.tableview.main;
+package biz.heiges.javafx.libary.tableview;
 
 /**
  * @author Hansjoachim Heiges
