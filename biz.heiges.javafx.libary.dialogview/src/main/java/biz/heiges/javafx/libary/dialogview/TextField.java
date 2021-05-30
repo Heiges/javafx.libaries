@@ -1,4 +1,4 @@
-package heiges.biz.javafx.libary.dialogview;
+package biz.heiges.javafx.libary.dialogview;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
