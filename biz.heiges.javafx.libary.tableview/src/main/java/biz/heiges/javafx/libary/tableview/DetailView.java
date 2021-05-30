@@ -1,4 +1,4 @@
-package heiges.biz.javafx.libary.tableview;
+package biz.heiges.javafx.libary.tableview;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

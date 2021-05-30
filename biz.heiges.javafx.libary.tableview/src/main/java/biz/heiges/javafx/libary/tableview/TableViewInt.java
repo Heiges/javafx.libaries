@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import biz.heiges.javafx.libary.commons.Fonts;
-import biz.heiges.javafx.libary.tableview.cell.ActionCell;
 import biz.heiges.javafx.libary.tableview.cell.SelectThisRowCell;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -75,6 +74,8 @@ class TableViewInt<DATA_BINDING extends TableViewDataModelBinding> extends VBox 
 
 		// build the column for selecting a row in the table
 		selectARowColumn = buildSelectedColumn();
+		
+		//FIXME
 		selectARowColumn.setCellFactory(cellFactory -> new SelectThisRowCell<>());
 
 		// FIXME what is the correct Type for a row with buttons only?

@@ -2,11 +2,10 @@ package biz.heiges.javafx.libary.tableview.main;
 
 import java.util.ArrayList;
 
+import biz.heiges.javafx.libary.tableview.ColumnType;
+import biz.heiges.javafx.libary.tableview.TableView;
 import biz.heiges.javafx.libary.tableview.test.TestItemFactory;
 import biz.heiges.javafx.libary.tableview.test.TestTableViewBinding;
-import heiges.biz.javafx.libary.tableview.ColumnType;
-import heiges.biz.javafx.libary.tableview.TableView;
-import heiges.biz.javafx.libary.tableview.ViewType;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

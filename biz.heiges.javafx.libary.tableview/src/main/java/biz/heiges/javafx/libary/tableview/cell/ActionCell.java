@@ -1,7 +1,7 @@
-package heiges.biz.javafx.libary.tableview.cell;
+package biz.heiges.javafx.libary.tableview.cell;
 
-import heiges.biz.javafx.libary.commons.Fonts;
-import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
+import biz.heiges.javafx.libary.commons.Fonts;
+import biz.heiges.javafx.libary.tableview.TableViewDataModelBinding;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;

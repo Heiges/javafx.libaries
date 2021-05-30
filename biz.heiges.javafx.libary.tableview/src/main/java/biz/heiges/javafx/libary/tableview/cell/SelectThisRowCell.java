@@ -1,6 +1,6 @@
-package heiges.biz.javafx.libary.tableview.cell;
+package biz.heiges.javafx.libary.tableview.cell;
 
-import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
+import biz.heiges.javafx.libary.tableview.TableViewDataModelBinding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;

@@ -1,6 +1,6 @@
 package biz.heiges.javafx.libary.tableview.test;
 
-import heiges.biz.javafx.libary.tableview.TableViewDataModelBinding;
+import biz.heiges.javafx.libary.tableview.TableViewDataModelBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 

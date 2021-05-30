@@ -1,4 +1,4 @@
-package heiges.biz.javafx.libary.tableview;
+package biz.heiges.javafx.libary.tableview;
 
 /**
  * Factory for building the data for a new line
