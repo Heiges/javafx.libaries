@@ -16,8 +16,8 @@ public class DialogView extends VBox {
 		grid.setPadding(new Insets(10, 10, 10, 10));
 
 		// FIXME do we need to bind width and height property?
-//		grid.prefHeightProperty().bind(this.heightProperty());
-//		grid.prefWidthProperty().bind(this.widthProperty());
+		grid.prefHeightProperty().bind(this.heightProperty());
+		grid.prefWidthProperty().bind(this.widthProperty());
 
 		// FIXME temporary for testing
 		TextField f1 = new TextField("label", "value");
